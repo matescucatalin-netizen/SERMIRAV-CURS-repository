@@ -32,7 +32,7 @@
   .rate-row { display:grid; grid-template-columns:2.5fr 1.2fr 1.2fr; align-items:center; padding:7px 16px; border-radius:8px; border:1px solid transparent; background:#000; animation:rowIn 0.5s ease forwards; opacity:0; }
   @keyframes rowIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
   .currency-cell { display:flex; align-items:center; gap:20px; }
-  .flag { font-size:3.8vw; line-height:1; width:4.5vw; text-align:center; }
+  .flag { width:4.5vw; text-align:center; display:flex; align-items:center; justify-content:center; } .flag img { width:3.5vw; height:auto; border-radius:3px; }
   .currency-name { font-size:3vw; font-weight:900; color:#fff; }
   .rate-cell { text-align:center; }
   .rate-box { display:inline-block; padding:6px 18px; border-radius:6px; font-family:'Oswald',sans-serif; font-size:2.8vw; font-weight:800; letter-spacing:1px; min-width:5.5vw; }
@@ -156,7 +156,8 @@ const db = getDatabase(app);
 const ratesRef = ref(db, 'rates');
 
 const ADMIN_PASSWORD = '2580';
-const FLAGS = { EUR:'🇪🇺', USD:'🇺🇸', GBP:'🇬🇧', CHF:'🇨🇭', CAD:'🇨🇦', AUD:'🇦🇺', PLN:'🇵🇱', BGN:'🇧🇬', TRY:'🇹🇷', HUF:'🇭🇺' };
+const FLAGS = { EUR:'eu', USD:'us', GBP:'gb', CHF:'ch', CAD:'ca', AUD:'au', PLN:'pl', BGN:'bg', TRY:'tr', HUF:'hu' };
+function flagImg(code) { return '<img src="https://flagcdn.com/w40/' + (FLAGS[code]||'un') + '.png" alt="' + code + '">'; }
 const NAMES = { EUR:'Euro', USD:'Dolar american', GBP:'Lira sterlina', CHF:'Franc elvețian', CAD:'Dolar canadian', AUD:'Dolar australian', PLN:'Zlot polonez', BGN:'Leva bulgărească', TRY:'Liră turcească', HUF:'Forint maghiar' };
 
 let CURRENCIES = [
@@ -204,7 +205,7 @@ function renderDisplay() {
     row.style.animationDelay = (i * 0.04) + 's';
     row.innerHTML = `
       <div class="currency-cell">
-        <div class="flag">${FLAGS[c.code]||'🏳'}</div>
+        <div class="flag">${flagImg(c.code)}</div>
         <div class="currency-name">${NAMES[c.code]||c.code}</div>
       </div>
       <div class="rate-cell rate-buy"><div class="rate-box" id="buy-d-${i}">${c.buy.toFixed(4)}</div></div>
@@ -222,7 +223,7 @@ function renderAdmin() {
     row.className = 'admin-row';
     row.innerHTML = `
       <div class="admin-currency-name">
-        <span style="font-size:18px">${FLAGS[c.code]||'🏳'}</span>
+        <img src="https://flagcdn.com/w40/${FLAGS[c.code]||'un'}.png" style="width:24px;border-radius:2px">
         <span>${NAMES[c.code]||c.code}</span>
       </div>
       <input type="number" class="admin-input" id="adm-buy-${i}" value="${c.buy.toFixed(4)}" step="0.0001" min="0">
