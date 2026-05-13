@@ -33,9 +33,9 @@
   @keyframes rowIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
   .currency-cell { display:flex; align-items:center; gap:20px; }
   .flag { width:4.5vw; text-align:center; display:flex; align-items:center; justify-content:center; } .flag img { width:3.5vw; height:auto; border-radius:3px; }
-  .currency-name { font-size:3vw; font-weight:900; color:#fff; }
+  .currency-name { font-size:3.4vw; font-weight:900; color:#fff; }
   .rate-cell { text-align:center; }
-  .rate-box { display:inline-block; padding:6px 18px; border-radius:6px; font-family:'Oswald',sans-serif; font-size:2.8vw; font-weight:800; letter-spacing:1px; min-width:5.5vw; }
+  .rate-box { display:inline-block; padding:8px 20px; border-radius:6px; font-family:'Oswald',sans-serif; font-size:3.4vw; font-weight:900; letter-spacing:1px; min-width:6vw; }
   .rate-buy .rate-box { background:rgba(63,185,80,0.15); border:1px solid rgba(63,185,80,0.4); color:var(--green); }
   .rate-sell .rate-box { background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.4); color:var(--gold2); }
   .footer { padding:8px 40px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border); background:#000; flex-shrink:0; }
@@ -72,7 +72,29 @@
   .pwd-btn { width:100%; padding:12px; background:linear-gradient(135deg,#C9A84C,#a8832e); border:none; border-radius:8px; color:#000; font-family:'Oswald',sans-serif; font-size:14px; font-weight:900; letter-spacing:3px; text-transform:uppercase; cursor:pointer; }
   .pwd-error { font-size:12px; color:var(--red); margin-top:8px; min-height:18px; }
   .pwd-cancel { background:none; border:none; color:rgba(255,255,255,0.4); font-size:12px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; margin-top:10px; font-family:'Roboto Condensed',sans-serif; }
+
+/* Ticker */
+.ticker-wrap {
+width:100%; background:#000; border-top:1px solid var(–border);
+overflow:hidden; flex-shrink:0; padding:6px 0;
+}
+.ticker-text {
+display:inline-block;
+white-space:nowrap;
+animation:tickerMove 20s linear infinite;
+font-family:‘Oswald’,sans-serif;
+font-size:1.6vw;
+font-weight:700;
+letter-spacing:3px;
+text-transform:uppercase;
+color:var(–gold);
+}
+@keyframes tickerMove {
+from { transform: translateX(100vw); }
+to { transform: translateX(-100%); }
+}
 </style>
+
 </head>
 <body>
 
@@ -111,6 +133,11 @@
   <div class="footer">
     <div class="footer-left">Cursurile sunt orientative și pot fi negociate</div>
     <div class="footer-right">Sermirav Exchange · Râmnicu Vâlcea</div>
+  </div>
+  <div class="ticker-wrap">
+    <span class="ticker-text">
+      ★ CURSURI NEGOCIABILE &nbsp;&nbsp;&nbsp; ★ NEGOCIEM ORICE VALUTĂ &nbsp;&nbsp;&nbsp; ★ CURSURI FĂRĂ CONCURENȚĂ &nbsp;&nbsp;&nbsp; ★ CUMPĂRĂM ȘI VINDEM AUR &nbsp;&nbsp;&nbsp; ★ AMANET &nbsp;&nbsp;&nbsp; ★ SERMIRAV EXCHANGE · RÂMNICU VÂLCEA &nbsp;&nbsp;&nbsp;
+    </span>
   </div>
   <button class="admin-btn" onclick="openPwd()">⚙ Admin</button>
 </div>
