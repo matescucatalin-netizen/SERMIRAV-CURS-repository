@@ -93,6 +93,10 @@ color:var(–gold);
 from { transform: translateX(100vw); }
 to { transform: translateX(-100%); }
 }
+
+.weather-box { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.weather-temp { font-family:‘Oswald’,sans-serif; font-size:2vw; font-weight:700; color:var(–gold); }
+.weather-city { font-size:0.9vw; color:rgba(255,255,255,0.5); letter-spacing:2px; text-transform:uppercase; }
 </style>
 
 </head>
@@ -121,6 +125,10 @@ to { transform: translateX(-100%); }
     </div>
 
 ```
+<div class="weather-box">
+  <div class="weather-temp" id="weatherTemp">--°C</div>
+  <div class="weather-city" id="weatherCity">Râmnicu Vâlcea</div>
+</div>
 <div class="clock-area">
   <div class="clock-time" id="clock">--:--</div>
   <div class="clock-date" id="datedisp">--</div>
@@ -320,6 +328,21 @@ renderDisplay();
 updateClock();
 setInterval(updateClock, 1000);
 
+
+async function fetchWeather() {
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=45.0997&longitude=24.3693&current=temperature_2m,weathercode&timezone=auto');
+    const d = await r.json();
+    const temp = Math.round(d.current.temperature_2m);
+    const code = d.current.weathercode;
+    const icons = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+    const descs = {0:'Senin',1:'Senin',2:'Parțial noros',3:'Noros',45:'Ceață',48:'Ceață',51:'Burniță',53:'Burniță',55:'Burniță',61:'Ploaie',63:'Ploaie',65:'Ploaie',71:'Ninsoare',73:'Ninsoare',75:'Ninsoare',80:'Averse',81:'Averse',82:'Averse',95:'Furtună',96:'Furtună',99:'Furtună'};
+    document.getElementById('weatherTemp').textContent = (icons[code]||'🌤️') + ' ' + temp + '°C';
+    document.getElementById('weatherCity').textContent = descs[code] || 'Râmnicu Vâlcea';
+  } catch(e) {}
+}
+fetchWeather();
+setInterval(fetchWeather, 600000);
 </script>
 
 </body>
