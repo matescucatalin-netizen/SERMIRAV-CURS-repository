@@ -25,12 +25,11 @@
   .clock-area { text-align:right; }
   .clock-time { font-family:'Oswald',sans-serif; font-size:5vw; font-weight:500; color:var(--gold); letter-spacing:4px; line-height:1; }
   .clock-date { font-size:1.4vw; color:#fff; letter-spacing:3px; margin-top:4px; text-transform:uppercase; }
-  .col-headers { display:grid; grid-template-columns:2.5fr 1.2fr 1.2fr 1.2fr; padding:6px 40px; background:#000; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .col-headers { display:grid; grid-template-columns:2.5fr 1.2fr 1.2fr; padding:6px 40px; background:#000; border-bottom:1px solid var(--border); flex-shrink:0; }
   .col-h { font-family:'Oswald',sans-serif; font-size:1.8vw; font-weight:700; letter-spacing:3px; color:var(--gold); text-transform:uppercase; text-align:center; }
   .col-h:first-child { text-align:left; }
-  .col-h.spark { text-align:center; }
   .rates-table { flex:1; display:flex; flex-direction:column; padding:4px 40px; gap:2px; overflow:hidden; }
-  .rate-row { display:grid; grid-template-columns:2.5fr 1.2fr 1.2fr 1.2fr; align-items:center; padding:7px 16px; border-radius:8px; border:1px solid transparent; background:#000; animation:rowIn 0.5s ease forwards; opacity:0; }
+  .rate-row { display:grid; grid-template-columns:2.5fr 1.2fr 1.2fr; align-items:center; padding:7px 16px; border-radius:8px; border:1px solid transparent; background:#000; animation:rowIn 0.5s ease forwards; opacity:0; }
   @keyframes rowIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
   .currency-cell { display:flex; align-items:center; gap:20px; }
   .flag { width:4.5vw; text-align:center; display:flex; align-items:center; justify-content:center; } .flag img { width:3.5vw; height:auto; border-radius:3px; }
@@ -98,9 +97,6 @@ to { transform: translateX(-100%); }
 .weather-box { display:flex; flex-direction:column; align-items:center; justify-content:center; }
 .weather-temp { font-family:‘Oswald’,sans-serif; font-size:2vw; font-weight:700; color:var(–gold); }
 .weather-city { font-size:0.9vw; color:rgba(255,255,255,0.5); letter-spacing:2px; text-transform:uppercase; }
-
-.sparkline-cell { display:flex; align-items:center; justify-content:center; }
-.sparkline { width:6vw; height:2.5vw; }
 </style>
 
 </head>
@@ -144,7 +140,6 @@ to { transform: translateX(-100%); }
     <div class="col-h">Valută</div>
     <div class="col-h" style="color:var(--green)">CUMPĂRĂM</div>
     <div class="col-h" style="color:var(--gold)">VINDEM</div>
-    <div class="col-h spark" style="color:rgba(255,255,255,0.4)">7 ZILE</div>
   </div>
   <div class="rates-table" id="ratesTable"></div>
   <div class="footer">
@@ -254,7 +249,6 @@ function renderDisplay() {
       </div>
       <div class="rate-cell rate-buy"><div class="rate-box" id="buy-d-${i}">${c.buy.toFixed(4)}</div></div>
       <div class="rate-cell rate-sell"><div class="rate-box" id="sell-d-${i}">${c.sell.toFixed(4)}</div></div>
-      <div class="sparkline-cell"><canvas class="sparkline" id="spark-${i}"></canvas></div>
     `;
     table.appendChild(row);
   });
@@ -349,78 +343,6 @@ async function fetchWeather() {
 }
 fetchWeather();
 setInterval(fetchWeather, 600000);
-
-// Fetch 7-day history and draw sparklines
-const SPARK_CODES = { EUR:'EUR', USD:'USD', GBP:'GBP', CHF:'CHF', CAD:'CAD', AUD:'AUD', PLN:'PLN', BGN:'BGN', TRY:'TRY', HUF:'HUF' };
-
-async function fetchSparklines() {
-  try {
-    const end = new Date().toISOString().split('T')[0];
-    const start = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
-    
-    // Use ECB rates via frankfurter.app for EUR-based rates
-    const res = await fetch(`https://api.frankfurter.app/${start}..${end}?from=RON&to=EUR,USD,GBP,CHF,CAD,AUD,PLN,BGN,TRY,HUF`);
-    const data = await res.json();
-    
-    const dates = Object.keys(data.rates).sort();
-    
-    CURRENCIES.forEach((c, i) => {
-      const canvas = document.getElementById('spark-' + i);
-      if (!canvas) return;
-      
-      const values = dates.map(d => {
-        const rate = data.rates[d][c.code];
-        return rate ? 1/rate : null;
-      }).filter(v => v !== null);
-      
-      if (values.length < 2) return;
-      
-      drawSparkline(canvas, values);
-    });
-  } catch(e) {
-    console.log('Sparkline error:', e);
-  }
-}
-
-function drawSparkline(canvas, values) {
-  const ctx = canvas.getContext('2d');
-  const w = canvas.offsetWidth || canvas.width;
-  const h = canvas.offsetHeight || canvas.height;
-  canvas.width = w;
-  canvas.height = h;
-  
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  
-  const isUp = values[values.length-1] >= values[0];
-  const color = isUp ? '#3fb950' : '#f85149';
-  
-  ctx.clearRect(0, 0, w, h);
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 4;
-  
-  values.forEach((v, i) => {
-    const x = (i / (values.length - 1)) * w;
-    const y = h - ((v - min) / range) * (h - 4) - 2;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-  
-  // Fill area under line
-  ctx.lineTo(w, h);
-  ctx.lineTo(0, h);
-  ctx.closePath();
-  ctx.fillStyle = isUp ? 'rgba(63,185,80,0.15)' : 'rgba(248,81,73,0.15)';
-  ctx.fill();
-}
-
-setTimeout(fetchSparklines, 1000);
-setInterval(fetchSparklines, 3600000); // update every hour
-
 </script>
 
 </body>
