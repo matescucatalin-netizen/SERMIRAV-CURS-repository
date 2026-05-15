@@ -93,11 +93,6 @@ color:var(–gold);
 from { transform: translateX(100vw); }
 to { transform: translateX(-100%); }
 }
-
-.weather-area { text-align:center; }
-.weather-temp { font-family:‘Oswald’,sans-serif; font-size:2.5vw; font-weight:700; color:var(–gold); line-height:1; }
-.weather-desc { font-size:1vw; color:rgba(255,255,255,0.6); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
-.weather-icon { font-size:2vw; }
 </style>
 
 </head>
@@ -124,14 +119,14 @@ to { transform: translateX(-100%); }
       <div class="ticker-label"><span class="ticker-dot"></span>Curs Live</div>
       <div class="sync-status" id="syncStatus">se conectează...</div>
     </div>
-    <div class="weather-area" id="weatherArea" style="display:none">
-      <div class="weather-temp"><span class="weather-icon" id="weatherIcon">🌤</span> <span id="weatherTemp">--</span>°C</div>
-      <div class="weather-desc" id="weatherDesc">Râmnicu Vâlcea</div>
-    </div>
-    <div class="clock-area">
-      <div class="clock-time" id="clock">--:--</div>
-      <div class="clock-date" id="datedisp">--</div>
-    </div>
+
+```
+<div class="clock-area">
+  <div class="clock-time" id="clock">--:--</div>
+  <div class="clock-date" id="datedisp">--</div>
+</div>
+```
+
   </div>
   <div class="col-headers">
     <div class="col-h">Valută</div>
@@ -324,42 +319,6 @@ function updateClock() {
 renderDisplay();
 updateClock();
 setInterval(updateClock, 1000);
-
-// Weather for Ramnicu Valcea
-async function fetchWeather() {
-  try {
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=45.0997&longitude=24.3693&current=temperature_2m,weathercode&timezone=Europe/Bucharest');
-    const data = await res.json();
-    const temp = Math.round(data.current.temperature_2m);
-    const code = data.current.weathercode;
-    
-    const icons = {
-      0:'☀️', 1:'🌤', 2:'⛅', 3:'☁️',
-      45:'🌫', 48:'🌫', 51:'🌦', 53:'🌦', 55:'🌧',
-      61:'🌧', 63:'🌧', 65:'🌧', 71:'❄️', 73:'❄️', 75:'❄️',
-      80:'🌦', 81:'🌧', 82:'⛈', 95:'⛈', 96:'⛈', 99:'⛈'
-    };
-    
-    const descs = {
-      0:'Senin', 1:'Mostly Clear', 2:'Parțial noros', 3:'Noros',
-      45:'Ceață', 48:'Ceață', 51:'Burniță', 53:'Burniță', 55:'Burniță',
-      61:'Ploaie ușoară', 63:'Ploaie', 65:'Ploaie puternică',
-      71:'Ninsoare ușoară', 73:'Ninsoare', 75:'Ninsoare puternică',
-      80:'Averse', 81:'Averse', 82:'Averse puternice',
-      95:'Furtună', 96:'Furtună', 99:'Furtună'
-    };
-
-    document.getElementById('weatherTemp').textContent = temp;
-    document.getElementById('weatherIcon').textContent = icons[code] || '🌤';
-    document.getElementById('weatherDesc').textContent = descs[code] || 'Râmnicu Vâlcea';
-    document.getElementById('weatherArea').style.display = 'block';
-  } catch(e) {
-    console.log('Weather error:', e);
-  }
-}
-
-fetchWeather();
-setInterval(fetchWeather, 600000); // update every 10 min
 
 </script>
 
