@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SERMIRAV EXCHANGE HERMES — Curs Valutar</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0B0C10; }
+
+#display {
+  width:100vw; height:100vh;
+  display:flex; flex-direction:column;
+  background:#0B0C10;
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  transform:translateZ(0);
+}
+
+/* HEADER */
+.header {
+  display:flex; align-items:center;
+  justify-content:space-between;
+  padding:0.5vh 3vw;
+  border-bottom:5px solid #050608;
+  flex-shrink:0; background:#0B0C10;
+  min-height:13vh;
+}
+.logo-name {
+  font-family:'Oswald',sans-serif;
+  font-size:5vw; font-weight:900;
+  color:#FFFFFF; letter-spacing:1px;
+  line-height:1.05; text-transform:uppercase;
+}
+.logo-name span { color:#C8960C; }
+.logo-sub {
+  font-family:'Oswald',sans-serif;
+  font-size:2vw; color:#888E99;
+  letter-spacing:2px; text-transform:uppercase;
+  margin-top:2px; font-weight:700;
+}
+.clock-wrap { text-align:center; }
+.clock {
+  font-family:'Oswald',sans-serif;
+  font-size:9vw; font-weight:900;
+  color:#FFFFFF; letter-spacing:2px; line-height:1;
+  cursor:pointer;
+}
+.date-txt {
+  font-family:'Oswald',sans-serif;
+  font-size:1.6vw; color:#888E99;
+  letter-spacing:2px; text-transform:uppercase;
+  margin-top:2px; font-weight:700;
+}
+.header-mid { text-align:right; }
+.weather-wrap { text-align:right; }
+.weather-temp {
+  font-family:'Oswald',sans-serif;
+  font-size:4.5vw; font-weight:900;
+  color:#FF4D4D; letter-spacing:2px; line-height:1;
+}
+.weather-desc {
+  font-family:'Oswald',sans-serif;
+  font-size:1.7vw; color:#FFFFFF;
+  letter-spacing:2px; text-transform:uppercase;
+  margin-top:2px; font-weight:700;
+}
+.weather-loc {
+  font-family:'Oswald',sans-serif;
+  font-size:1.4vw; color:#888E99;
+  letter-spacing:2px; text-transform:uppercase;
+  margin-top:1px; font-weight:700;
+}
+.dot {
+  width:12px; height:12px; background:#00FF66;
+  border:2px solid #0B0C10; border-radius:50%;
+  animation:blink 1.5s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.sync-txt {
+  font-size:1.3vw; color:#666B73;
+  letter-spacing:1px; margin-top:2px;
+  font-family:'Oswald',sans-serif; font-weight:700;
+}
+.sync-txt.ok { color:#FF4D4D; }
+.sync-txt.err { color:#FF4D4D; }
+
+/* COL HEADERS */
+.col-headers {
+  display:grid;
+  grid-template-columns:1.1fr 1.2fr 0.25fr 1.2fr;
+  padding:0.6vh 2vw;
+  border-bottom:4px solid #050608;
+  background:#050608;
+  flex-shrink:0;
+}
+.col-h {
+  font-family:'Oswald',sans-serif;
+  font-size:3.8vw; font-weight:900;
+  letter-spacing:2px; text-transform:uppercase; text-align:center;
+}
+.col-h:first-child { text-align:left; padding-left:1vw; color:#FFFFFF; }
+.col-h.buy { color:#FF4D4D; }
+.col-h.sell { color:#FF4D4D; }
+
+/* RATES TABLE */
+.rates-table {
+  flex:1;
+  display:flex; flex-direction:column;
+  padding:0 1vw;
+  overflow:visible;
+  background:#0B0C10;
+  position:relative;
+  z-index:10;
+}
+.rate-row {
+  display:grid;
+  grid-template-columns:1.1fr 1.2fr 0.25fr 1.2fr;
+  align-items:center;
+  flex:1;
+  border-bottom:2px solid #14171E;
+  padding:1.2vh 0;
+}
+.rate-row:last-child { border-bottom:none; }
+.rate-row:nth-child(even) { background:#14171E; }
+
+.sep-dash {
+  font-family:'Oswald',sans-serif;
+  font-size:4vw; font-weight:900;
+  color:#FFFFFF; text-align:center;
+  display:block; line-height:1;
+  -webkit-text-stroke:2px #FFFFFF;
+}
+
+.currency-cell {
+  display:flex; align-items:center;
+  justify-content:flex-start;
+  padding-left:0vw;
+  gap:3.5vw;
+}
+.flag-wrap {
+  width:17vw; height:11.4vw;
+  flex-shrink:0; border-radius:4px;
+  overflow:hidden; display:block;
+  box-shadow:0 0 0 2px #FFFFFF;
+  background:transparent;
+  animation: flagWave 3s ease-in-out infinite;
+  transform-origin: left center;
+}
+@keyframes flagWave {
+  0%   { transform: skewY(0deg) scaleX(1); }
+  20%  { transform: skewY(3deg) scaleX(0.97); }
+  40%  { transform: skewY(-3deg) scaleX(1.03); }
+  60%  { transform: skewY(2deg) scaleX(0.98); }
+  80%  { transform: skewY(-2deg) scaleX(1.02); }
+  100% { transform: skewY(0deg) scaleX(1); }
+}
+.flag-wrap svg {
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+}
+
+.currency-code {
+  font-family:'Oswald',sans-serif;
+  font-size:14vw; font-weight:900;
+  color:#FFFFFF; letter-spacing:1px; line-height:1;
+}
+
+.rate-cell { text-align:center; }
+.rate-val {
+  font-family:'Oswald',sans-serif;
+  font-size:11.5vw; font-weight:900;
+  display:inline-block; line-height:1;
+  letter-spacing:-1px;
+  transform:scaleX(0.85) scaleY(2.0);
+}
+.rate-val.buy { color:#FF4D4D; }
+.rate-val.sell { color:#FF4D4D; }
+
+.sep-dash {
+  font-family:'Oswald',sans-serif;
+  font-size:4.5vw; font-weight:900;
+  color:#FFFFFF; text-align:center;
+  display:block; line-height:1;
+  -webkit-text-stroke:2px #FFFFFF;
+}
+
+.currency-cell {
+  display:flex; align-items:center;
+  justify-content:flex-start;
+  padding-left:0vw;
+  gap:3.5vw;
+}
+.flag-wrap {
+  width:17vw; height:11.4vw;
+  flex-shrink:0; border-radius:4px;
+  overflow:hidden; display:block;
+  box-shadow:0 0 0 2px #FFFFFF;
+  background:transparent;
+  animation: flagWave 3s ease-in-out infinite;
+  transform-origin: left center;
+}
+@keyframes flagWave {
+  0%   { transform: skewY(0deg) scaleX(1); }
+  20%  { transform: skewY(3deg) scaleX(0.97); }
+  40%  { transform: skewY(-3deg) scaleX(1.03); }
+  60%  { transform: skewY(2deg) scaleX(0.98); }
+  80%  { transform: skewY(-2deg) scaleX(1.02); }
+  100% { transform: skewY(0deg) scaleX(1); }
+}
+.flag-wrap svg {
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+}
+
+.currency-code {
+  font-family:'Oswald',sans-serif;
+  font-size:14vw; font-weight:900;
+  color:#FFFFFF; letter-spacing:1px; line-height:1;
+}
+
+.rate-cell { text-align:center; }
+.rate-val {
+  font-family:'Oswald',sans-serif;
+  font-size:11.5vw; font-weight:900;
+  display:inline-block; line-height:1;
+  transform:scaleX(0.85) scaleY(2.0);
+}
+.rate-val.buy { color:#FF4D4D; }
+.rate-val.sell { color:#FF4D4D; }
+
+/* TICKER JOS - negru, text alb mare */
+.ticker-wrap {
+  width:100%;
+  background:#000000;
+  border-top:5px solid #050608;
+  padding:2.5vh 0;
+  overflow:hidden;
+  flex-shrink:0;
+  position:relative;
+  z-index:1;
+  margin-top:-3vh;
+}
+.ticker-track {
+  display:flex;
+  width:max-content;
+  animation:ticker 40s linear infinite;
+  will-change:transform;
+}
+@keyframes ticker {
+  0%   { transform: translate3d(0,0,0); }
+  100% { transform: translate3d(-50%,0,0); }
+}
+.ticker-txt {
+  font-family:'Oswald',sans-serif;
+  font-size:18vw; font-weight:900;
+  color:#FFFFFF;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  padding:0 8vw;
+}
+
+/* BUTON ADMIN ASCUNS */
+.admin-btn {
+  position:fixed; bottom:8px; right:8px;
+  width:22px; height:22px;
+  background:transparent; border:none;
+  color:rgba(255,255,255,0.04);
+  font-family:'Oswald',sans-serif;
+  font-size:14px; font-weight:900;
+  cursor:pointer; z-index:999;
+  line-height:22px; text-align:center;
+  user-select:none;
+}
+
+/* PWD OVERLAY */
+#pwd-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(11,12,16,0.98); z-index:2000;
+  justify-content:center; align-items:center;
+}
+#pwd-overlay.show { display:flex; }
+.pwd-box {
+  background:#14171E; border:3px solid #FFFFFF;
+  border-radius:16px; padding:40px;
+  text-align:center; width:320px;
+}
+.pwd-title {
+  font-family:'Oswald',sans-serif; font-size:22px;
+  color:#FFFFFF; text-transform:uppercase; font-weight:900; margin-bottom:8px;
+}
+.pwd-sub { font-size:12px; color:#888E99; margin-bottom:20px; }
+.pwd-input {
+  width:100%; background:#0B0C10; border:2px solid #FFFFFF;
+  border-radius:8px; color:#FFFFFF; font-size:26px;
+  padding:10px; text-align:center; letter-spacing:8px;
+  margin-bottom:14px; font-family:'Oswald',sans-serif;
+}
+.pwd-input:focus { outline:none; border-color:#C8960C; }
+.pwd-btn {
+  width:100%; padding:12px; background:#FFFFFF;
+  border:none; border-radius:8px; color:#0B0C10;
+  font-family:'Oswald',sans-serif; font-size:16px;
+  font-weight:900; letter-spacing:3px; text-transform:uppercase; cursor:pointer;
+}
+.pwd-error { font-size:13px; color:#FF4D4D; margin-top:8px; font-weight:700; min-height:18px; }
+.pwd-cancel {
+  background:none; border:none; color:#888E99;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  cursor:pointer; margin-top:12px; font-family:'Oswald',sans-serif; font-weight:700;
+}
+
+/* ADMIN PANEL */
+#admin {
+  display:none; position:fixed; inset:0;
+  background:rgba(5,6,8,0.98); z-index:1000;
+  overflow-y:auto; padding:20px 16px;
+}
+.admin-panel {
+  max-width:560px; margin:0 auto;
+  background:#14171E; border-radius:14px;
+  border:2px solid #FFFFFF; overflow:hidden;
+}
+.admin-header {
+  background:#050608; padding:16px 24px;
+  border-bottom:2px solid #FFFFFF;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.admin-title {
+  font-family:'Oswald',sans-serif; font-size:20px;
+  font-weight:900; color:#FFFFFF; letter-spacing:2px;
+}
+.admin-close {
+  background:#FFFFFF; border:none; color:#050608;
+  width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; font-weight:900;
+}
+.admin-body { padding:16px 24px; }
+.admin-row-header {
+  display:grid; grid-template-columns:1.8fr 1fr 1fr;
+  gap:8px; padding:4px 10px; margin-bottom:6px;
+}
+.admin-col-label {
+  font-size:11px; font-weight:900; letter-spacing:3px;
+  text-transform:uppercase; text-align:center;
+  font-family:'Oswald',sans-serif;
+}
+.admin-col-label:first-child { text-align:left; color:#FFFFFF; }
+.admin-row {
+  display:grid; grid-template-columns:1.8fr 1fr 1fr;
+  gap:8px; align-items:center; margin-bottom:8px;
+  padding:10px 12px; background:#0B0C10;
+  border-radius:8px; border:1px solid #14171E;
+}
+.admin-currency-name {
+  display:flex; align-items:center; gap:10px;
+  font-size:15px; font-weight:900; color:#FFFFFF;
+  font-family:'Oswald',sans-serif; letter-spacing:1px;
+}
+.admin-flag { width:30px; height:20px; flex-shrink:0; border-radius:3px; overflow:hidden; box-shadow:0 0 0 1.5px #FFFFFF; }
+.admin-flag svg { width:100%; height:100%; display:block; }
+.admin-input {
+  background:#14171E; border:2px solid #FFFFFF;
+  border-radius:6px; color:#FFFFFF;
+  font-family:'Oswald',sans-serif; font-size:16px; font-weight:700;
+  padding:8px; text-align:center; width:100%;
+}
+.admin-input:focus { outline:none; border-color:#C8960C; }
+.admin-save-btn {
+  width:100%; margin-top:16px; padding:14px;
+  background:#FFFFFF; border:none; border-radius:10px; color:#0B0C10;
+  font-family:'Oswald',sans-serif; font-size:16px;
+  font-weight:900; letter-spacing:3px; text-transform:uppercase; cursor:pointer;
+}
+.admin-save-btn:disabled { opacity:0.4; }
+.save-confirm {
+  text-align:center; margin-top:10px; font-size:14px;
+  letter-spacing:2px; opacity:0; transition:opacity 0.3s;
+  min-height:20px; font-family:'Oswald',sans-serif; font-weight:900;
+}
+.save-confirm.show { opacity:1; }
+.save-confirm.ok { color:#FF4D4D; }
+.save-confirm.err { color:#FF4D4D; }
+</style>
+</head>
+<body>
+
+<div id="pwd-overlay">
+  <div class="pwd-box">
+    <div class="pwd-title">Admin Access</div>
+    <div class="pwd-sub">Introduceți parola</div>
+    <input type="password" class="pwd-input" id="pwd-input" placeholder="••••" maxlength="20">
+    <button class="pwd-btn" onclick="checkPassword()">Intră</button>
+    <div class="pwd-error" id="pwd-error"></div><br>
+    <button class="pwd-cancel" onclick="closePwd()">Anulează</button>
+  </div>
+</div>
+
+<div id="display">
+  <div class="header">
+    <div>
+      <div class="logo-name" style="color:#fff;font-size:7vw">SCHIMB VALUTAR</div>
+      <div class="logo-name" style="font-size:8vw">SERMIRAV <span>HERMES</span></div>
+      <div class="logo-sub">EXCHANGE MONEY</div>
+    </div>
+  </div>
+
+  <div class="col-headers">
+    <div class="col-h">Valută</div>
+    <div class="col-h buy">Cumpărăm</div>
+    <div class="col-h"></div>
+    <div class="col-h sell">Vindem</div>
+  </div>
+
+  <div class="rates-table" id="ratesTable"></div>
+
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-txt">✦ CURSURI NEGOCIABILE &nbsp;·&nbsp; NEGOCIEM ORICE VALUTĂ &nbsp;·&nbsp; CASASCHIMBVALUTARVALCEA.RO &nbsp;·&nbsp; CURSURI NEGOCIABILE &nbsp;·&nbsp; NEGOCIEM ORICE VALUTĂ &nbsp;·&nbsp; CASASCHIMBVALUTARVALCEA.RO &nbsp;·&nbsp;</span>
+      <span class="ticker-txt">✦ CURSURI NEGOCIABILE &nbsp;·&nbsp; NEGOCIEM ORICE VALUTĂ &nbsp;·&nbsp; CASASCHIMBVALUTARVALCEA.RO &nbsp;·&nbsp; CURSURI NEGOCIABILE &nbsp;·&nbsp; NEGOCIEM ORICE VALUTĂ &nbsp;·&nbsp; CASASCHIMBVALUTARVALCEA.RO &nbsp;·&nbsp;</span>
+    </div>
+  </div>
+</div>
+
+<button class="admin-btn" onclick="openPwd()">S</button>
+
+<div id="admin">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <div class="admin-title">Modifică Cursuri</div>
+      <button class="admin-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-body">
+      <div class="admin-row-header">
+        <div class="admin-col-label">Valută</div>
+        <div class="admin-col-label" style="color:#00FF66">Cumpărăm</div>
+        <div class="admin-col-label" style="color:#FF4D4D">Vindem</div>
+      </div>
+      <div id="adminRows"></div>
+      <button class="admin-save-btn" id="adminSaveBtn" onclick="saveRates()">✓ Salvează Cursurile</button>
+      <div class="save-confirm" id="saveConfirm"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD7K-y9cX-fPbpGOetaCTwe8G8gpMy-ML0",
+  authDomain: "sermirav-exchange.firebaseapp.com",
+  databaseURL: "https://sermirav-exchange-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "sermirav-exchange",
+  storageBucket: "sermirav-exchange.firebasestorage.app",
+  messagingSenderId: "913088674029",
+  appId: "1:913088674029:web:8c3a77e3c5f5925a7fb4e4"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const ratesRef = ref(db, 'rates');
+const ADMIN_PASSWORD = '2580';
+
+const FLAGS = {
+  EUR:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600"><rect width="900" height="600" fill="#003399"/><g fill="#FFCC00"><polygon points="450,100 461,134 497,134 469,155 480,189 450,168 420,189 431,155 403,134 439,134" id="s0"/><use href="#s0" transform="rotate(30,450,300)"/><use href="#s0" transform="rotate(60,450,300)"/><use href="#s0" transform="rotate(90,450,300)"/><use href="#s0" transform="rotate(120,450,300)"/><use href="#s0" transform="rotate(150,450,300)"/><use href="#s0" transform="rotate(180,450,300)"/><use href="#s0" transform="rotate(210,450,300)"/><use href="#s0" transform="rotate(240,450,300)"/><use href="#s0" transform="rotate(270,450,300)"/><use href="#s0" transform="rotate(300,450,300)"/><use href="#s0" transform="rotate(330,450,300)"/></g></svg>`,
+  USD:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 100"><rect width="190" height="100" fill="#B22234"/><rect y="14" width="190" height="8" fill="#fff"/><rect y="29" width="190" height="8" fill="#fff"/><rect y="44" width="190" height="8" fill="#fff"/><rect y="59" width="190" height="8" fill="#fff"/><rect y="74" width="190" height="8" fill="#fff"/><rect y="89" width="190" height="8" fill="#fff"/><rect width="76" height="54" fill="#3C3B6E"/><g fill="#fff"><circle cx="6" cy="5" r="3"/><circle cx="16" cy="5" r="3"/><circle cx="26" cy="5" r="3"/><circle cx="36" cy="5" r="3"/><circle cx="46" cy="5" r="3"/><circle cx="56" cy="5" r="3"/><circle cx="66" cy="5" r="3"/><circle cx="11" cy="12" r="3"/><circle cx="21" cy="12" r="3"/><circle cx="31" cy="12" r="3"/><circle cx="41" cy="12" r="3"/><circle cx="51" cy="12" r="3"/><circle cx="61" cy="12" r="3"/><circle cx="71" cy="12" r="3"/><circle cx="6" cy="19" r="3"/><circle cx="16" cy="19" r="3"/><circle cx="26" cy="19" r="3"/><circle cx="36" cy="19" r="3"/><circle cx="46" cy="19" r="3"/><circle cx="56" cy="19" r="3"/><circle cx="66" cy="19" r="3"/><circle cx="11" cy="26" r="3"/><circle cx="21" cy="26" r="3"/><circle cx="31" cy="26" r="3"/><circle cx="41" cy="26" r="3"/><circle cx="51" cy="26" r="3"/><circle cx="61" cy="26" r="3"/><circle cx="71" cy="26" r="3"/><circle cx="6" cy="33" r="3"/><circle cx="16" cy="33" r="3"/><circle cx="26" cy="33" r="3"/><circle cx="36" cy="33" r="3"/><circle cx="46" cy="33" r="3"/><circle cx="56" cy="33" r="3"/><circle cx="66" cy="33" r="3"/><circle cx="11" cy="40" r="3"/><circle cx="21" cy="40" r="3"/><circle cx="31" cy="40" r="3"/><circle cx="41" cy="40" r="3"/><circle cx="51" cy="40" r="3"/><circle cx="61" cy="40" r="3"/><circle cx="71" cy="40" r="3"/><circle cx="6" cy="47" r="3"/><circle cx="16" cy="47" r="3"/><circle cx="26" cy="47" r="3"/><circle cx="36" cy="47" r="3"/><circle cx="46" cy="47" r="3"/><circle cx="56" cy="47" r="3"/><circle cx="66" cy="47" r="3"/></g></svg>`,
+  GBP:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="7"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4.5"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="11"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6.5"/></svg>`,
+  CHF:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 20"><rect width="32" height="20" fill="#FF0000"/><rect x="13.5" y="4" width="5" height="12" fill="#fff"/><rect x="9" y="7.5" width="14" height="5" fill="#fff"/></svg>`,
+  CAD:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><rect width="600" height="400" fill="#fff"/><rect width="150" height="400" fill="#FF0000"/><rect x="450" width="150" height="400" fill="#FF0000"/><path d="M300,70 L318,125 L378,125 L330,158 L348,213 L300,180 L252,213 L270,158 L222,125 L282,125 Z" fill="#FF0000"/></svg>`,
+  AUD:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect width="60" height="30" fill="#00008B"/><path d="M0,0 L30,15 M30,0 L0,15" stroke="#fff" stroke-width="5"/><path d="M0,0 L30,15 M30,0 L0,15" stroke="#CC0001" stroke-width="3"/><path d="M15,0 V15 M0,7.5 H30" stroke="#fff" stroke-width="9"/><path d="M15,0 V15 M0,7.5 H30" stroke="#CC0001" stroke-width="5.5"/><polygon points="45,6 46.5,10.5 51,10.5 47.5,13 49,17.5 45,15 41,17.5 42.5,13 39,10.5 43.5,10.5" fill="#fff"/></svg>`,
+  PLN:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 10"><rect width="16" height="10" fill="#fff"/><rect y="5" width="16" height="5" fill="#DC143C"/></svg>`,
+  TRY:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20"><rect width="30" height="20" fill="#E30A17"/><circle cx="12" cy="10" r="6.5" fill="#fff"/><circle cx="14.2" cy="10" r="5.2" fill="#E30A17"/><polygon points="20,10 23,6 23,14" fill="#fff" transform="rotate(-20,20,10)"/></svg>`,
+  HUF:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="2" fill="#CE2939"/><rect y="0.667" width="3" height="0.667" fill="#fff"/><rect y="1.334" width="3" height="0.666" fill="#477050"/></svg>`,
+  BGN:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect width="3" height="2" fill="#fff"/><rect y="0.667" width="3" height="0.667" fill="#00966E"/><rect y="1.334" width="3" height="0.666" fill="#D62612"/></svg>`
+};
+
+const NAMES = {
+  EUR:'Euro', USD:'Dolar American', GBP:'Lira Sterlina',
+  CHF:'Franc Elvetian', CAD:'Dolar Canadian', AUD:'Dolar Australian',
+  PLN:'Zlot Polonez', TRY:'Lira Turceasca', HUF:'Forint Maghiar', BGN:'Leva Bulgareasca'
+};
+
+let CURRENCIES = [
+  { code:'EUR', buy:5.1260, sell:5.2100 },
+  { code:'USD', buy:4.3340, sell:4.4440 },
+  { code:'GBP', buy:5.8230, sell:6.0400 },
+  { code:'CHF', buy:5.5970, sell:5.7100 },
+  { code:'CAD', buy:3.0750, sell:3.3000 },
+  { code:'AUD', buy:2.7620, sell:3.1000 },
+  { code:'PLN', buy:1.1450, sell:1.2200 },
+  { code:'TRY', buy:0.0950, sell:0.1190 },
+  { code:'HUF', buy:0.0130, sell:0.0141 },
+  { code:'BGN', buy:2.2500, sell:2.6660 },
+];
+
+async function fetchRates() {
+  try {
+    const snapshot = await get(ratesRef);
+    const data = snapshot.val();
+    if (data && Array.isArray(data)) {
+      data.forEach(r => {
+        const idx = CURRENCIES.findIndex(c => c.code === r.code);
+        if (idx >= 0) {
+          CURRENCIES[idx].buy = r.buy;
+          CURRENCIES[idx].sell = r.sell;
+          const b = document.getElementById('buy-'+idx);
+          const s = document.getElementById('sell-'+idx);
+          if (b) { b.textContent = r.buy.toFixed(4); s.textContent = r.sell.toFixed(4); }
+        }
+      });
+    }
+  } catch(e) {
+    console.log('eroare fetch:', e);
+  }
+}
+
+fetchRates();
+setInterval(fetchRates, 30000); // refresh la 30 secunde, fara flash
+
+let clockClicks = 0, clockTimer = null;
+function handleClockClick() {
+  clockClicks++;
+  if (clockTimer) clearTimeout(clockTimer);
+  clockTimer = setTimeout(() => { clockClicks = 0; }, 1500);
+  if (clockClicks >= 3) {
+    clockClicks = 0;
+    window.openPwd();
+  }
+}
+
+// Cod secret tastat - 2580
+let secretBuffer = '';
+let secretTimer = null;
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT') return;
+  secretBuffer += e.key;
+  if (secretTimer) clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => { secretBuffer = ''; }, 2000);
+  if (secretBuffer.includes('2580')) {
+    secretBuffer = '';
+    renderAdmin();
+    document.getElementById('admin').style.display = 'block';
+  }
+});
+
+function renderDisplay() {
+  const table = document.getElementById('ratesTable');
+  table.innerHTML = '';
+  CURRENCIES.forEach((c, i) => {
+    const row = document.createElement('div');
+    row.className = 'rate-row';
+    row.innerHTML = `
+      <div class="currency-cell">
+        <div class="currency-code">${c.code}</div>
+      </div>
+      <div class="rate-cell"><span class="rate-val buy" id="buy-${i}">${c.buy.toFixed(4)}</span></div>
+      <div class="rate-cell"><span class="sep-dash">—</span></div>
+      <div class="rate-cell"><span class="rate-val sell" id="sell-${i}">${c.sell.toFixed(4)}</span></div>
+    `;
+    table.appendChild(row);
+  });
+}
+
+function renderAdmin() {
+  const container = document.getElementById('adminRows');
+  container.innerHTML = '';
+  CURRENCIES.forEach((c, i) => {
+    const row = document.createElement('div');
+    row.className = 'admin-row';
+    row.innerHTML = `
+      <div class="admin-currency-name">
+        <div class="admin-flag">${FLAGS[c.code]||''}</div>
+        <span>${c.code} · ${NAMES[c.code]}</span>
+      </div>
+      <input type="number" class="admin-input" id="adm-buy-${i}" value="${c.buy.toFixed(4)}" step="0.0001" min="0">
+      <input type="number" class="admin-input" id="adm-sell-${i}" value="${c.sell.toFixed(4)}" step="0.0001" min="0">
+    `;
+    container.appendChild(row);
+  });
+}
+
+window.saveRates = async function() {
+  const btn = document.getElementById('adminSaveBtn');
+  const confirmEl = document.getElementById('saveConfirm');
+  btn.disabled = true; btn.textContent = '⏳ Se salvează...';
+  const newRates = CURRENCIES.map((c, i) => ({
+    code: c.code,
+    buy: parseFloat(document.getElementById('adm-buy-'+i).value)||c.buy,
+    sell: parseFloat(document.getElementById('adm-sell-'+i).value)||c.sell,
+  }));
+  try {
+    await set(ratesRef, newRates);
+    confirmEl.textContent = '✓ CURSURI SALVATE!';
+    confirmEl.className = 'save-confirm show ok';
+  } catch(e) {
+    confirmEl.textContent = '✕ Eroare: '+e.message;
+    confirmEl.className = 'save-confirm show err';
+  }
+  btn.disabled = false; btn.textContent = '✓ Salvează Cursurile';
+  setTimeout(()=>confirmEl.classList.remove('show'), 5000);
+};
+
+window.openPwd = function() {
+  document.getElementById('pwd-input').value='';
+  document.getElementById('pwd-error').textContent='';
+  document.getElementById('pwd-overlay').classList.add('show');
+};
+window.closePwd = function() { document.getElementById('pwd-overlay').classList.remove('show'); };
+window.checkPassword = function() {
+  if (document.getElementById('pwd-input').value === ADMIN_PASSWORD) {
+    window.closePwd(); renderAdmin(); document.getElementById('admin').style.display='block';
+  } else {
+    document.getElementById('pwd-error').textContent='✕ Parolă incorectă';
+    document.getElementById('pwd-input').value='';
+  }
+};
+window.closeAdmin = function() { document.getElementById('admin').style.display='none'; };
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && document.getElementById('pwd-overlay').classList.contains('show')) window.checkPassword();
+  if (e.key==='Escape') { window.closePwd(); window.closeAdmin(); }
+});
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const days=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
+  const months=['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('datedisp').textContent =
+    `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+}
+
+// VREME LIVE - Ramnicu Valcea (Open-Meteo, fara API key)
+const WEATHER_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+const WEATHER_DESCS = {0:'Senin',1:'Senin',2:'Parțial noros',3:'Noros',45:'Ceață',48:'Ceață',51:'Burniță',53:'Burniță',55:'Burniță',61:'Ploaie',63:'Ploaie',65:'Ploaie',71:'Ninsoare',73:'Ninsoare',75:'Ninsoare',80:'Averse',81:'Averse',82:'Averse',95:'Furtună',96:'Furtună',99:'Furtună'};
+
+async function fetchWeather() {
+  try {
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=45.0997&longitude=24.3693&current=temperature_2m,weathercode&timezone=auto');
+    const data = await res.json();
+    const temp = Math.round(data.current.temperature_2m);
+    const code = data.current.weathercode;
+    document.getElementById('weatherTemp').textContent = `${WEATHER_ICONS[code]||'🌤️'} ${temp}°C`;
+    document.getElementById('weatherDesc').textContent = WEATHER_DESCS[code] || '';
+  } catch(e) {
+    document.getElementById('weatherTemp').textContent = '--°C';
+    document.getElementById('weatherDesc').textContent = 'indisponibil';
+  }
+}
+
+fetchWeather();
+setInterval(fetchWeather, 10 * 60 * 1000); // refresh la 10 minute
+
+renderDisplay();
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
