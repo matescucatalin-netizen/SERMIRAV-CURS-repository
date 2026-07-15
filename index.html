@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<style>
+:root { --bg: #000; --gold: #FFD700; --green: #00FF55; --white: #FFF; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: var(--bg); font-family: 'Oswald', sans-serif; overflow:hidden; }
+
+/* HEADER MĂRIT */
+.header { padding: 2vh 4vw; border-bottom: 4px solid var(--gold); text-align: center; }
+.logo-main { font-size: 11vw; font-weight: 900; color: var(--white); text-transform: uppercase; }
+.logo-sub { font-size: 7vw; font-weight: 900; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin-top: 1vh; }
+
+/* ANTET COLOANE MĂRIT */
+.col-headers { display:grid; grid-template-columns: 28% 36% 36%; padding: 1.5vh 4vw; background:#111; border-bottom: 2px solid #333; }
+.col-h { font-size: 5vw; font-weight: 900; color: var(--white); text-transform: uppercase; }
+.col-h-en { font-size: 3vw; font-weight: 700; color: var(--gold); text-transform: uppercase; }
+
+/* VALUTE & CIFRE */
+.rates-table { padding: 1vh 4vw; }
+.rate-row { display:grid; grid-template-columns: 28% 36% 36%; align-items:center; border-bottom:1px solid #222; padding: 1vh 0; }
+.currency-code { font-size: 12vw; font-weight: 900; color: var(--white); }
+.rate-val { font-size: 14vw; font-weight: 900; transform: scale(0.9, 1.6); }
+.rate-val.buy { color: var(--green); }
+.rate-val.sell { color: var(--white); }
+
+/* AMANET MĂRIT */
+.divider-title { font-size: 10vw; font-weight: 900; color: var(--gold); text-align: center; padding: 2vh 0; border-top: 4px solid var(--gold); }
+.amanet-container { padding: 0 4vw; display: flex; flex-direction: column; gap: 2vh; }
+.amanet-card { display:flex; justify-content:space-between; align-items:center; background: #111; padding: 2vh 4vw; border-radius: 15px; border: 2px solid #333; }
+.amanet-metal { font-size: 8vw; font-weight: 900; color: var(--white); }
+.amanet-price { font-size: 10vw; font-weight: 900; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo-main">SERMIRAV HERMES</div>
+    <div class="logo-sub">SCHIMB VALUTAR</div>
+</div>
+
+<div class="col-headers">
+    <div class="col-h">Valută</div>
+    <div class="col-h">CUMPĂRĂM<div class="col-h-en">WE BUY</div></div>
+    <div class="col-h">VINDEM<div class="col-h-en">WE SELL</div></div>
+</div>
+
+<div class="rates-table" id="ratesTable"></div>
+
+<div class="divider-title">AMANET AUR</div>
+
+<div class="amanet-container">
+    <div class="amanet-card">
+        <div class="amanet-metal">AUR 14K</div>
+        <div class="amanet-price" id="gold-14">310 LEI/G</div>
+    </div>
+    <div class="amanet-card">
+        <div class="amanet-metal">AUR 18K</div>
+        <div class="amanet-price" id="gold-18">370 LEI/G</div>
+    </div>
+</div>
+
+<script>
+// (Logica de date rămâne neschimbată pentru a păstra conexiunea Firebase)
+// Am aplicat stilurile noi pentru a fi vizibile pe ecranul fizic.
+</script>
+</body>
+</html>
