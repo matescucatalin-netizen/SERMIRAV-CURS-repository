@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #000; --gold: #FFD700; --green: #00FF55; --white: #FFF; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: var(--bg); font-family: 'Oswald', sans-serif; overflow:hidden; color: #fff; }
+
+/* DESIGN ECRAN PRINCIPAL */
+.header { padding: 1.5vh 4vw; border-bottom: 4px solid var(--gold); text-align: center; }
+.logo-main { font-size: 10vw; font-weight: 900; color: var(--white); text-transform: uppercase; line-height:1; }
+.logo-sub { font-size: 6vw; font-weight: 900; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin-top: 0.5vh; }
+.col-headers { display:grid; grid-template-columns: 20% 40% 40%; padding: 1.5vh 4vw; background:#111; }
+.col-h { font-size: 4vw; font-weight: 900; color: var(--white); text-transform: uppercase; text-align: center; }
+.col-h-en { font-size: 2.5vw; font-weight: 700; color: var(--gold); }
+.rates-table { padding: 1vh 4vw; }
+.rate-row { display:grid; grid-template-columns: 20% 40% 40%; align-items:center; border-bottom:1px solid #222; padding: 1.2vh 0; }
+.currency-code { font-size: 11vw; font-weight: 900; color: var(--white); text-align: left; }
+.rate-val { font-size: 13vw; font-weight: 900; transform: scale(0.9, 1.5); }
+.rate-val.buy { color: var(--green); text-align: left; padding-left: 2vw; } 
+.rate-val.sell { color: var(--white); text-align: right; }
+.divider-title { font-size: 9vw; font-weight: 900; color: var(--gold); text-align: center; padding: 2vh 0; border-top: 4px solid var(--gold); border-bottom: 4px solid var(--gold); }
+.amanet-container { padding: 2vh 4vw; display: flex; flex-direction: column; gap: 2vh; }
+.amanet-card { display:flex; justify-content:space-between; align-items:center; background: #111; padding: 2.5vh 4vw; border-radius: 15px; border: 2px solid #333; }
+.amanet-metal { font-size: 8vw; font-weight: 900; color: var(--white); }
+.amanet-price { font-size: 10vw; font-weight: 900; color: var(--gold); }
+
+/* STILURI ADMIN */
+#admin-panel { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999; padding:20px; }
+.admin-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
+.admin-row input { width: 120px; font-size: 24px; padding: 5px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div id="display-area">
+    <div class="header">
+        <div class="logo-main">SERMIRAV HERMES</div>
+        <div class="logo-sub">SCHIMB VALUTAR</div>
+    </div>
+    <div class="col-headers">
+        <div class="col-h">Valută</div>
+        <div class="col-h">CUMPĂRĂM<div class="col-h-en">WE BUY</div></div>
+        <div class="col-h">VINDEM<div class="col-h-en">WE SELL</div></div>
+    </div>
+    <div class="rates-table" id="ratesTable"></div>
+    <div class="divider-title">AMANET AUR</div>
+    <div class="amanet-container">
+        <div class="amanet-card"><div class="amanet-metal">AUR 14K</div><div class="amanet-price" id="gold-14">---</div></div>
+        <div class="amanet-card"><div class="amanet-metal">AUR 18K</div><div class="amanet-price" id="gold-18">---</div></div>
+    </div>
+</div>
+
+<div id="admin-panel">
+    <h2 style="text-align:center; margin-bottom:20px;">PANOU ADMIN (MODIFICARE CURSURI)</h2>
+    <div id="edit-area"></div>
+    <button onclick="saveAll()" style="width:100%; padding:20px; font-size:30px; background:#FFD700; border:none; margin-top:20px; cursor:pointer;">SALVEAZĂ TOT</button>
+    <button onclick="document.getElementById('admin-panel').style.display='none'" style="width:100%; padding:20px; font-size:30px; background:#444; color:white; border:none; margin-top:10px; cursor:pointer;">ÎNCHIDE</button>
+</div>
+
+<button onclick="checkPass()" style="position:fixed; bottom:0; right:0; width:50px; height:50px; opacity:0.1; cursor:pointer;"></button>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = { apiKey:"AIzaSyD7K-y9cX-fPbpGOetaCTwe8G8gpMy-ML0", authDomain:"sermirav-exchange.firebaseapp.com", databaseURL:"https://sermirav-exchange-default-rtdb.europe-west1.firebasedatabase.app", projectId:"sermirav-exchange", storageBucket:"sermirav-exchange.firebasestorage.app", messagingSenderId:"913088674029", appId:"1:913088674029:web:8c3a77e3c5f5925a7fb4e4" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function updateUI() {
+    db.ref('rates').once('value').then(snap => {
+        const rates = snap.val();
+        const container = document.getElementById('ratesTable');
+        container.innerHTML = '';
+        rates.forEach((r, i) => {
+            container.innerHTML += `<div class="rate-row"><div class="currency-code">${r.code}</div><div class="rate-val buy">${r.buy.toFixed(4)}</div><div class="rate-val sell">${r.sell.toFixed(4)}</div></div>`;
+        });
+    });
+    db.ref('gold').once('value').then(snap => {
+        const g = snap.val();
+        document.getElementById('gold-14').innerText = g.k14 + " LEI/G";
+        document.getElementById('gold-18').innerText = g.k18 + " LEI/G";
+    });
+}
+
+function checkPass() {
+    const p = prompt("Introduceți parola:");
+    if(p === "2580") {
+        document.getElementById('admin-panel').style.display = 'block';
+        loadAdmin();
+    }
+}
+
+function loadAdmin() {
+    db.ref('rates').once('value').then(snap => {
+        const data = snap.val();
+        const area = document.getElementById('edit-area');
+        area.innerHTML = '';
+        data.forEach((r, i) => {
+            area.innerHTML += `<div class="admin-row"><span>${r.code}</span>
+                Cump: <input type="number" step="0.0001" id="buy-${i}" value="${r.buy}">
+                Vânz: <input type="number" step="0.0001" id="sell-${i}" value="${r.sell}">
+            </div>`;
+        });
+    });
+}
+
+function saveAll() {
+    const inputs = document.querySelectorAll('.admin-row');
+    inputs.forEach((row, i) => {
+        const b = document.getElementById('buy-'+i).value;
+        const s = document.getElementById('sell-'+i).value;
+        db.ref('rates/'+i).update({buy: parseFloat(b), sell: parseFloat(s)});
+    });
+    alert("Cursuri salvate!");
+    location.reload();
+}
+
+updateUI();
+setInterval(updateUI, 30000);
+</script>
+</body>
+</html>
