@@ -1,0 +1,14 @@
+{
+  "name": "sermirav-rate-sync",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Sincronizeaza automat cursurile din ExchangeOnline (Datagram) catre Firebase, pentru panourile Sermirav.",
+  "main": "update-rates.js",
+  "scripts": {
+    "start": "node update-rates.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "firebase-admin": "^12.0.0"
+  }
+}
