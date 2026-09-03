@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SERMIRAV HERMES — Display</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#050E0A;
+  font-family:'Oswald', sans-serif;
+  color:#FFF;
+  overflow:hidden;
+  width:100vw;
+  height:100vh;
+}
+#display {
+  width:100vw;
+  height:100vh;
+  padding:0.5vh 0.3vw 0.5vh 0.3vw;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+/* =========================
+   HEADER
+========================= */
+.header {
+  text-align:center;
+  padding-bottom:0.2vh;
+  margin-bottom:0vh;
+  border-bottom:3px solid #F2C660;
+  flex:0 0 auto;
+}
+.title-card {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:97vw;
+  padding:0.9vh 1.7vw;
+  margin-bottom:0vh;
+  margin-left:auto;
+  margin-right:auto;
+  border-radius:10px;
+  box-sizing:border-box;
+  background:#050505;
+  border:1.5px solid #B8860B;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,0,0,0.6),
+             0 0 14px rgba(184,134,11,0.35);
+  isolation:isolate;
+  contain:layout paint;
+  transform:translateZ(0);
+}
+.title-card::before {
+  content:'';
+  position:absolute;
+  top:0;
+  left:-60%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,233,168,0.2), transparent);
+  animation:goldShine 4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes goldShine {
+  0% { left:-60%; }
+  100% { left:140%; }
+}
+.title-card-inner {
+  position:relative;
+  z-index:1;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.rule {
+  width:38%;
+  height:1.5px;
+  background:linear-gradient(90deg, transparent, #B8860B, transparent);
+}
+.rule:first-child {
+  margin-bottom:1vh;
+}
+.rule:last-child {
+  margin-top:0.2vh;
+}
+.logo-name {
+  font-family:'Cinzel', serif;
+  font-size:8.8vw;
+  font-weight:900;
+  letter-spacing:0.5px;
+  line-height:1;
+  position:relative;
+  z-index:1;
+  white-space:nowrap;
+  transform:scaleX(0.98) scaleY(1.3) translateZ(0);
+  transform-origin:center;
+  background:linear-gradient(90deg, #E8C878, #FFF6DE, #FFDE8A, #FFF6DE, #E8C878);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmerText 4s linear infinite;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  will-change:background-position;
+}
+@keyframes shimmerText {
+  0% { background-position:0% center; }
+  100% { background-position:200% center; }
+}
+.cube-wrap {
+  height:8.5vw;
+  margin-top:0.4vh;
+  flex:0 0 auto;
+  width:auto;
+  min-width:66vw;
+  isolation:isolate;
+  contain:layout paint;
+}
+.cube {
+  position:relative;
+  width:100%;
+  height:100%;
+}
+.cube-face {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:7vw;
+  font-weight:900;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  background:linear-gradient(90deg, #B8860B, #FFE9A8, #F2C660, #FFE9A8, #B8860B);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  opacity:0;
+  animation:cubeFade 4s ease-in-out infinite;
+}
+.cube-face.front {
+  animation-delay:0s;
+}
+.cube-face.back {
+  animation-delay:-2s;
+}
+@keyframes cubeFade {
+  0%,38%   { opacity:1; }
+  50%,88%  { opacity:0; }
+  100%     { opacity:1; }
+}
+/* =========================
+   COLOANE
+========================= */
+.col-headers {
+  display:grid;
+  grid-template-columns:18% 82%;
+  padding:0 0 0.2vh 0;
+  margin-top:-1.2vh;
+  flex:0 0 auto;
+  align-items:center;
+}
+.col-h-valuta {
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+}
+.col-h-valuta .col-h-txt {
+  font-size:4.2vw;
+  transform:translateY(0.4vh);
+}
+.col-h-cubes-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5vw;
+  width:100%;
+}
+.slot-wrap {
+  position:relative;
+  height:4.8vh;
+  width:100%;
+  overflow:hidden;
+}
+.slot-track {
+  position:relative;
+  width:100%;
+  height:100%;
+}
+.slot-item {
+  height:4.8vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.slot-item .col-h-txt {
+  font-size:5.4vw;
+  transform:translateY(0.25vh);
+}
+.slot-item:nth-child(2) {
+  display:none;
+}
+.col-h-txt {
+  font-size:5vw;
+  font-weight:900;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  line-height:1;
+  background:linear-gradient(180deg, #FFFFFF 0%, #FFF3C4 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  -webkit-text-stroke:0.4px #B8860B;
+}
+/* =========================
+   TABEL VALUTE
+========================= */
+#ratesTable {
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  width:100%;
+  margin:0.05vh 0 -0.3vh 0;
+  isolation:isolate;
+  contain:layout paint;
+  transform:translateZ(0);
+}
+.rate-row {
+  display:grid;
+  grid-template-columns:18% 82%;
+  align-items:stretch;
+  flex:1 1 0;
+  min-height:0;
+  width:100%;
+}
+.code-wrap {
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  width:100%;
+  height:90%;
+  overflow:hidden;
+  position:relative;
+}
+.code {
+  font-size:9.9vw;
+  font-weight:900;
+  display:inline-block;
+  line-height:1;
+  transform:scaleX(0.78) scaleY(1.55) translateZ(0);
+  transform-origin:left center;
+  white-space:nowrap;
+  background:linear-gradient(90deg, #B8860B, #FFE9A8, #F2C660, #FFE9A8, #B8860B);
+  background-size:200% auto;
+  background-position:50% center;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.rate-card-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5vw;
+  width:100%;
+  height:90%;
+  align-items:center;
+}
+.rate-card {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:0.6vw;
+  overflow:hidden;
+  width:100%;
+  padding:0;
+  height:100%;
+}
+.val {
+  font-size:11vw;
+  font-weight:900;
+  line-height:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-sizing:border-box;
+  width:100%;
+  height:100%;
+  white-space:nowrap;
+  transform:scaleY(1.62) translateY(0vh) translateZ(0);
+  transform-origin:center center;
+}
+.digit {
+  display:inline-block;
+  width:0.58em;
+  text-align:center;
+}
+.digit-dot {
+  display:inline-block;
+  width:0.22em;
+  text-align:center;
+}
+.buy {
+  color:#FFFFFF;
+  background:linear-gradient(135deg, #FFE9A8 0%, #F2C660 15%, #C9A227 40%, #A6791A 60%, #8B6508 78%, #4A3308 100%);
+}
+.sell {
+  color:#FFFFFF;
+  background:linear-gradient(135deg, #FF9494 0%, #E23C3C 15%, #B33030 40%, #921F1F 60%, #6E1414 78%, #350808 100%);
+}
+/* =========================
+   AUR
+========================= */
+.gold-section {
+  padding-top:0vh;
+  margin-top:0vh;
+  text-align:center;
+  flex:0 0 auto;
+  isolation:isolate;
+  contain:layout paint;
+}
+.gold-title-bar {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:2.8vw;
+  margin-bottom:0.4vh;
+}
+.gold-title-bar::before,
+.gold-title-bar::after {
+  content:'';
+  flex:1;
+  max-width:12vw;
+  height:4px;
+  background:linear-gradient(90deg, transparent, #FFD700, transparent);
+}
+.gold-cube-wrap {
+  height:8.5vw;
+  flex:0 0 auto;
+  width:auto;
+  min-width:58vw;
+}
+.gold-face {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:7.5vw;
+  letter-spacing:1px;
+  background:linear-gradient(90deg, #B8860B, #FFE9A8, #F2C660, #FFE9A8, #B8860B);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  opacity:0;
+  animation:cubeFade 4s ease-in-out infinite;
+}
+.gold-face.front {
+  animation-delay:0s;
+}
+.gold-face.back {
+  animation-delay:-2s;
+}
+.gold-item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0.6vh 2.5vw;
+  margin-bottom:0.8vh;
+  border-radius:12px;
+  background:linear-gradient(135deg, #6B4E12 0%, #A67C1E 45%, #6B4E12 100%);
+  border:2px solid #FFD98A;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,0,0,0.5),
+             inset 0 1px 0 rgba(255,255,255,0.15);
+  isolation:isolate;
+  contain:layout paint;
+  transform:translateZ(0);
+}
+.gold-item::before {
+  content:'';
+  position:absolute;
+  top:0;
+  left:-60%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,233,168,0.25), transparent);
+  animation:goldShine 4s ease-in-out infinite;
+  pointer-events:none;
+}
+.gold-txt {
+  color:#FFFFFF;
+  font-size:7vw;
+  font-weight:900;
+  letter-spacing:1px;
+  white-space:nowrap;
+  position:relative;
+  z-index:1;
+  text-shadow:0 2px 6px rgba(0,0,0,0.6);
+}
+.gold-val-wrap {
+  display:flex;
+  align-items:baseline;
+  justify-content:flex-end;
+  gap:1.2vw;
+  white-space:nowrap;
+  position:relative;
+  z-index:1;
+}
+.gold-upto {
+  font-size:4vw;
+  font-weight:700;
+  color:#FFFFFF;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  text-shadow:0 2px 6px rgba(0,0,0,0.6);
+}
+.gold-val {
+  font-size:7.5vw;
+  font-weight:900;
+  color:#FFFFFF;
+  letter-spacing:1px;
+  text-shadow:0 2px 6px rgba(0,0,0,0.6);
+}
+.gold-currency {
+  font-size:6.3vw;
+  font-weight:900;
+  color:#FFFFFF;
+  letter-spacing:1px;
+  text-shadow:0 2px 6px rgba(0,0,0,0.6);
+}
+.loading-msg {
+  color:#888E99;
+  text-align:center;
+  font-size:4vw;
+  padding:4vh 0;
+}
+</style>
+</head>
+<body>
+<div id="display">
+    <div class="header">
+        <div class="title-card">
+          <div class="title-card-inner">
+            <div class="rule"></div>
+            <span class="logo-name">SERMIRAV HERMES</span>
+            <div class="rule"></div>
+          </div>
+        </div>
+        <div class="gold-title-bar cube-wrap">
+          <div class="cube">
+            <div class="cube-face front">Schimb Valutar</div>
+            <div class="cube-face back">Cursuri Negociabile</div>
+          </div>
+        </div>
+    </div>
+    <div class="col-headers">
+        <div class="col-h-valuta">
+            <span class="col-h-txt">VALUTA</span>
+        </div>
+        <div class="col-h-cubes-grid">
+            <div class="slot-wrap">
+              <div class="slot-track buy-track">
+                <div class="slot-item">
+                  <span class="col-h-txt">CUMPARAM</span>
+                </div>
+                <div class="slot-item">
+                  <span class="col-h-txt">WE BUY</span>
+                </div>
+              </div>
+            </div>
+            <div class="slot-wrap">
+              <div class="slot-track sell-track">
+                <div class="slot-item">
+                  <span class="col-h-txt">VINDEM</span>
+                </div>
+                <div class="slot-item">
+                  <span class="col-h-txt">WE SELL</span>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="ratesTable">
+      <div class="loading-msg">Se încarcă...</div>
+    </div>
+    <div class="gold-section">
+        <div class="gold-title-bar">
+          <div class="cube-wrap gold-cube-wrap">
+            <div class="cube">
+              <div class="cube-face gold-face front">
+                Amanet Aur
+              </div>
+              <div class="cube-face gold-face back">
+                Cumparam Aur
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="gold-item">
+            <div class="gold-txt">
+              AUR 14K
+            </div>
+            <div class="gold-val-wrap">
+              <span class="gold-upto">PÂNĂ LA</span>
+              <span id="g14" class="gold-val">325</span>
+              <span class="gold-currency">LEI/G</span>
+            </div>
+        </div>
+        <div class="gold-item">
+            <div class="gold-txt">
+              AUR 18K
+            </div>
+            <div class="gold-val-wrap">
+              <span class="gold-upto">PÂNĂ LA</span>
+              <span id="g18" class="gold-val">405</span>
+              <span class="gold-currency">LEI/G</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import {
+  initializeApp
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getDatabase,
+  ref,
+  get
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+const firebaseConfig = {
+  apiKey: "AIzaSyD7K-y9cX-fPbpGOetaCTwe8G8gpMy-ML0",
+  authDomain: "sermirav-exchange.firebaseapp.com",
+  databaseURL: "https://sermirav-exchange-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "sermirav-exchange",
+  storageBucket: "sermirav-exchange.firebasestorage.app",
+  messagingSenderId: "913088674029",
+  appId: "1:913088674029:web:8c3a77e3c5f5925a7fb4e4"
+};
+const db = getDatabase(initializeApp(firebaseConfig));
+/* Citeste direct de la sursa pe care o scrie TV-ul LG (hermesTv/rates) —
+   acest panou VNNOX nu mai are admin propriu si nu mai scrie nimic,
+   doar citeste si afiseaza. */
+const tvRatesRef = ref(db, 'hermesTv/rates');
+
+/* Lista fixa de valute afisate, in ordinea dorita — datele din Firebase
+   sunt un obiect plat { EUR:{buy,sell}, USD:{buy,sell}, ... } scris de TV. */
+const CURRENCY_CODES = ['EUR','USD','GBP','CHF','CAD','AUD','PLN','TRY','HUF','AED'];
+
+const DEFAULT_RATES = {
+  EUR:{buy:5.1490, sell:5.2330},
+  USD:{buy:4.4490, sell:4.5300},
+  GBP:{buy:6.0090, sell:6.1100},
+  CHF:{buy:5.5090, sell:5.5950},
+  CAD:{buy:3.1250, sell:3.2650},
+  AUD:{buy:2.6900, sell:3.1100},
+  PLN:{buy:1.1050, sell:1.2550},
+  TRY:{buy:0.0950, sell:0.1190},
+  HUF:{buy:0.0132, sell:0.0149},
+  AED:{buy:1.0020, sell:1.2500}
+};
+const DEFAULT_GOLD = { k14:325, k18:405 };
+
+let CURRENCIES = CURRENCY_CODES.map(code => ({
+  code,
+  buy: DEFAULT_RATES[code].buy,
+  sell: DEFAULT_RATES[code].sell
+}));
+let GOLD = { ...DEFAULT_GOLD };
+
+function tabularNum(str) {
+  return str.split('').map(ch => {
+    if (ch >= '0' && ch <= '9') {
+      return `<span class="digit">${ch}</span>`;
+    }
+    return `<span class="digit-dot">${ch}</span>`;
+  }).join('');
+}
+
+let ratesBuilt = false;
+let lastValues = {};
+
+function buildRatesRows() {
+  document.getElementById('ratesTable').innerHTML =
+    CURRENCIES.map(r => `
+      <div class="rate-row">
+        <div class="code-wrap">
+          <div class="code">${r.code}</div>
+        </div>
+        <div class="rate-card-grid">
+          <div class="rate-card buy">
+            <div
+              class="val"
+              data-code="${r.code}"
+              data-field="buy"></div>
+          </div>
+          <div class="rate-card sell">
+            <div
+              class="val"
+              data-code="${r.code}"
+              data-field="sell"></div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  ratesBuilt = true;
+  lastValues = {};
+  updateRatesValues();
+}
+
+function updateRatesValues() {
+  CURRENCIES.forEach(r => {
+    const prev = lastValues[r.code] || {};
+    const buyStr = r.buy.toFixed(4);
+    const sellStr = r.sell.toFixed(4);
+    if (prev.buy !== buyStr) {
+      const el = document.querySelector(
+        '.val[data-code="' + r.code + '"][data-field="buy"]'
+      );
+      if (el) el.innerHTML = tabularNum(buyStr);
+    }
+    if (prev.sell !== sellStr) {
+      const el = document.querySelector(
+        '.val[data-code="' + r.code + '"][data-field="sell"]'
+      );
+      if (el) el.innerHTML = tabularNum(sellStr);
+    }
+    lastValues[r.code] = { buy:buyStr, sell:sellStr };
+  });
+  document.getElementById('g14').innerText = GOLD.k14;
+  document.getElementById('g18').innerText = GOLD.k18;
+}
+
+function renderDisplay() {
+  if (!ratesBuilt) {
+    buildRatesRows();
+  } else {
+    updateRatesValues();
+  }
+}
+
+async function load() {
+  try {
+    const snap = await get(tvRatesRef);
+    const d = snap.val();
+    if (d) {
+      CURRENCIES = CURRENCIES.map(r => {
+        const rv = d[r.code];
+        if (rv && typeof rv.buy === 'number' && typeof rv.sell === 'number') {
+          return { code: r.code, buy: rv.buy, sell: rv.sell };
+        }
+        return r;
+      });
+      if (d.gold) {
+        if (typeof d.gold.k14 === 'number') GOLD.k14 = d.gold.k14;
+        if (typeof d.gold.k18 === 'number') GOLD.k18 = d.gold.k18;
+      }
+    }
+    renderDisplay();
+  } catch (e) {
+    document.getElementById('ratesTable').innerHTML =
+      `<div class="loading-msg">
+        Eroare la încărcare: ${e.message}
+      </div>`;
+    ratesBuilt = false;
+  }
+}
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>
