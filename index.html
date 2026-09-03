@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sermirav Exchange Tic Tac</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; overflow:hidden; background:#f4f6f9; color:#111; font-family:'Oswald',sans-serif; -webkit-font-smoothing:antialiased; }
+.shell { width:100vw; height:100vh; display:grid; grid-template-rows:11vh 1fr; }
+.header { background:#ffffff; border-bottom:4px solid #dcdfe4; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:0 3vw; gap:1.5vw; box-shadow:0 4px 20px rgba(0,0,0,0.04); }
+
+.brand { line-height:1.1; position:relative; display:inline-block; }
+.brand-top { 
+  font-family:'Bebas Neue',sans-serif; 
+  font-size:5.8vh; 
+  font-weight:900; 
+  letter-spacing:0.22em; 
+  line-height:1; 
+  position:relative;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1), 0 0 15px rgba(26,122,58,0.15);
+}
+.brand-top .grn  { color:#1a7a3a; }
+.brand-top .gold { color:#a37a00; }
+
+.header-center { text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.weather-row { display:inline-flex; align-items:center; gap:0.8vw; font-size:4vh; color:#222; font-weight:600; line-height:1; }
+.weather-row strong { color:#111; font-size:5.5vh; font-weight:700; }
+.w-icon-container { width:7vh; height:7vh; display:flex; align-items:center; justify-content:center; animation:wPulse 3s ease-in-out infinite; }
+.w-icon-container svg { width:100%; height:100%; }
+@keyframes wPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+@keyframes fadeUpdateIn { 0% { opacity:0.5; transform:scale(0.98); } 100% { opacity:1; transform:scale(1); } }
+@keyframes pulseGlowBuy { 0%,100% { box-shadow:0 4px 10px rgba(36,182,99,0.1), 0 0 0px rgba(36,182,99,0); } 50% { box-shadow:0 4px 10px rgba(36,182,99,0.25), 0 0 15px rgba(36,182,99,0.2); } }
+@keyframes pulseGlowSell { 0%,100% { box-shadow:0 4px 10px rgba(254,74,73,0.1), 0 0 0px rgba(254,74,73,0); } 50% { box-shadow:0 4px 10px rgba(254,74,73,0.25), 0 0 15px rgba(254,74,73,0.2); } }
+.clock-wrap { text-align:right; }
+.clock-time { font-family:'Bebas Neue',sans-serif; font-size:8vh; letter-spacing:0.08em; line-height:1; color:#111; cursor:pointer; }
+.clock-s { font-size:5vh; color:rgba(0,0,0,0.35); }
+
+/* GRID ULTRA-COMPACT */
+.col-heads { display:contents; }
+.col-h { font-family:'Oswald',sans-serif; font-size:3.6vh; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; text-align:center; color:#495057; display:flex; align-items:center; justify-content:center; padding:0.4vh 0.6vw; background:#e9ecef; border-bottom:3px solid #ced4da; }
+.col-h:first-child { justify-content:flex-start; padding-left:1.5vw; }
+.col-h.buy { color:#1a7a3a; font-size:3.6vh; }
+.col-h.sell { color:#b3261e; font-size:3.6vh; }
+.col-h.card { color:#ffffff; font-size:3.6vh; background:linear-gradient(180deg,#1a3f8f 0%,#0d2454 100%); border-left:none; padding:0.4vh 0.8vw; }
+
+/* CONTAINER HEADER & CARD - CONVEIOR SEAMLESS */
+.card-cube-wrap, .hdr-cube-wrap { height:4.6vh; width:100%; overflow:hidden; }
+.hdr-cube-track, .card-cube-track {
+  display:flex;
+  flex-direction:column;
+  animation: boardLoop 9s ease-in-out infinite;
+}
+.hdr-cube-item, .card-cube-item {
+  height:4.6vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+}
+
+@keyframes boardLoop {
+  0%, 55.56% {
+    transform: translateY(0);
+  }
+  66.67%, 88.89% {
+    transform: translateY(-4.6vh);
+  }
+  100% {
+    transform: translateY(-9.2vh);
+  }
+}
+
+/* SPECIFIC CARD FACE STYLES */
+.card-cube-item.front { font-size:2.8vh; font-weight:900; letter-spacing:0.02em; }
+.card-cube-item.back { display:flex; align-items:center; justify-content:center; gap:0.6vw; font-family:'Bebas Neue',sans-serif; font-size:3.9vh; letter-spacing:0.08em; }
+.card-icon-svg { width:3.4vh; height:3.4vh; flex-shrink:0; }
+
+.table-wrap { display:grid; grid-template-columns:1.0fr 2.35fr 2.35fr 0.9fr; grid-template-rows:auto repeat(10, minmax(0,1fr)); height:100%; overflow:hidden; background:#f4f6f9; }
+.rates-body { display:contents; }
+.rate-row { display:contents; }
+.rr-border { border-bottom:1px solid #e1e5eb; }
+.rr-odd  { background:#ffffff; }
+.rr-even { background:#fafbfc; }
+
+.cur-cell { display:grid; grid-template-columns: 9.2vh 1fr; align-items:center; gap:0.5vw; padding-left:1.2vw; }
+.flag-img { width:9.2vh; height:6.1vh; object-fit:cover; border-radius:6px; border:1px solid rgba(0,0,0,0.12); box-shadow:0 3px 8px rgba(0,0,0,0.08); justify-self: start; }
+.cur-name-full { font-size:2.9vh; font-weight:700; color:#8f6a08; letter-spacing:0.01em; text-transform:uppercase; line-height:1.05; text-shadow: 0 1px 0 rgba(255,255,255,0.6), 0 1px 2px rgba(163,122,0,0.15); }
+
+.rate-cell { text-align:center; padding:0 1.4vw; display:flex; align-items:center; justify-content:center; height:100%; }
+.rate-cell.card-col { background:linear-gradient(180deg,#1a3f8f 0%,#0d2454 100%); border-left:none; padding:0 0.8vw; }
+.rate-box { display:inline-flex; align-items:center; justify-content:center; width:100%; padding:0.05em 0.2em; border-radius:12px; font-family:'Bebas Neue',sans-serif; font-size:6.4vh; letter-spacing:0.02em; line-height:1; font-weight:bold; transform:translateY(0.15vh); transition:all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.rate-box.buy  { background:linear-gradient(135deg,#eafaf1 0%,#cbf3db 100%); border:2.5px solid #24b663; color:#1a7a3a; box-shadow:0 4px 10px rgba(36,182,99,0.1), 0 0 0px rgba(36,182,99,0); letter-spacing:0.2em; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+.rate-box.buy.updating { animation:pulseGlowBuy 0.6s ease-in-out, fadeUpdateIn 0.5s ease-out; }
+.rate-box.sell { background:linear-gradient(135deg,#fdf2f2 0%,#fcd0d1 100%); border:2.5px solid #fe4a49; color:#b3261e; box-shadow:0 4px 10px rgba(254,74,73,0.1), 0 0 0px rgba(254,74,73,0); letter-spacing:0.2em; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+.rate-box.sell.updating { animation:pulseGlowSell 0.6s ease-in-out, fadeUpdateIn 0.5s ease-out; }
+.rate-box.card { background:rgba(255,255,255,0.96); border:2.5px solid rgba(255,255,255,0.55); color:#0d2454; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.rate-box.card.updating { animation:fadeUpdateIn 0.5s ease-out; }
+
+.admin-btn { position:fixed; bottom:1.8vh; right:1.8vw; z-index:500; width:3.8vh; height:3.8vh; border-radius:50%; background:rgba(163,122,0,0.08); border:1px solid rgba(163,122,0,0.22); color:rgba(163,122,0,0.45); font-family:'Bebas Neue',sans-serif; font-size:2vh; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.25s; }
+.admin-btn:hover { background:rgba(163,122,0,0.16); border-color:rgba(163,122,0,0.55); color:#a37a00; }
+@media(max-width:768px){
+  .shell{grid-template-rows:auto 1fr;overflow-y:auto}
+  .header{grid-template-columns:1fr;text-align:center;padding:1.5vh 4vw;gap:1vh}
+  .brand{order:1;text-align:center} .header-center{order:3;margin-top:0.5vh} .clock-wrap{order:2;text-align:center}
+  .brand-top{font-size:4.2vh} .clock-time{font-size:4.5vh} .weather-row{font-size:2.5vh} .weather-row strong{font-size:3vh}
+  .w-icon-container{width:4vh;height:4vh} .col-h{font-size:2.4vh} .col-h.buy, .col-h.sell{font-size:2.4vh} .col-h.card{font-size:2.4vh} .flag-img{width:5vh;height:3.3vh;border-radius:4px}
+  .cur-name-full{font-size:2.4vh} .rate-box{font-size:3.2vh;border-radius:8px}
+  .pin-box{width:85vw;padding:3vh 5vw} .admin-box{width:95vw;padding:2vh 3vw} .pin-dot{width:4vw;height:4vw}
+}
+.overlay { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.97); backdrop-filter:blur(20px); z-index:2000; align-items:center; justify-content:center; }
+.overlay.show { display:flex; }
+.pin-box { background:#ffffff; border:2px solid #dee2e6; border-radius:24px; padding:4vh 3vw; text-align:center; width:26vw; box-shadow:0 15px 40px rgba(0,0,0,0.08); }
+.pin-title { font-family:'Bebas Neue',sans-serif; font-size:3.5vh; letter-spacing:0.2em; color:#a37a00; margin-bottom:0.5vh; }
+.pin-sub { font-size:1.4vh; color:rgba(0,0,0,0.45); letter-spacing:0.15em; margin-bottom:3vh; }
+.pin-dots { display:flex; justify-content:center; gap:1.5vw; margin-bottom:3vh; }
+.pin-dot { width:1.8vw; height:1.8vw; border-radius:50%; border:2px solid #ced4da; transition:all 0.2s; }
+.pin-dot.on { background:#a37a00; border-color:#a37a00; box-shadow:0 0 1.5vw rgba(163,122,0,0.4); }
+.pin-keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:0.8vw; }
+.pin-key { padding:1.8vh 0; background:#f8f9fa; border:1px solid #e9ecef; border-radius:12px; color:#111; font-family:'Bebas Neue',sans-serif; font-size:3.5vh; cursor:pointer; user-select:none; transition:all 0.15s; }
+.pin-key:hover { background:#e9ecef; }
+.pin-key:active { transform:scale(0.94); }
+.pin-key.sm { font-family:'Oswald',sans-serif; font-size:1.4vh; color:rgba(0,0,0,0.6); font-weight:600; }
+.pin-err { font-size:1.4vh; color:#b70926; margin-top:1.5vh; min-height:1.8vh; font-weight:bold; }
+.admin-ov { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.98); backdrop-filter:blur(20px); z-index:1999; align-items:center; justify-content:center; }
+.admin-ov.show { display:flex; }
+.admin-box { background:#ffffff; border:2px solid #dee2e6; border-radius:24px; padding:3vh 2.5vw; width:52vw; max-height:90vh; overflow-y:auto; box-shadow:0 15px 50px rgba(0,0,0,0.1); }
+.adm-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:2vh; border-bottom:2px solid #eee; padding-bottom:1.5vh; }
+.adm-title { font-family:'Bebas Neue',sans-serif; font-size:3.2vh; color:#a37a00; }
+.adm-close { background:#f8f9fa; border:1px solid #ced4da; width:4vh; height:4vh; border-radius:50%; cursor:pointer; font-size:1.6vh; transition:all 0.2s; }
+.adm-close:hover { background:#fee2e2; border-color:#fe4a49; color:#b3261e; }
+.adm-cols { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:0.8vw; margin-bottom:1vh; text-align:center; font-size:1.4vh; font-weight:bold; color:rgba(0,0,0,0.45); letter-spacing:0.2em; text-transform:uppercase; }
+.adm-cols div:first-child { text-align:left; }
+.adm-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:0.8vw; align-items:center; margin-bottom:0.8vh; padding:1vh 1vw; background:#f8f9fa; border-radius:12px; border:1px solid #e9ecef; }
+.adm-card-preview { text-align:center; font-family:'Oswald',sans-serif; font-size:2.2vh; font-weight:bold; color:#1565c0; }
+.adm-cur { display:flex; align-items:center; gap:0.8vh; font-family:'Oswald',sans-serif; font-size:1.8vh; font-weight:700; color:#111; }
+.adm-input { background:#fff; border:2px solid #ced4da; border-radius:8px; font-family:'Oswald',sans-serif; font-size:2.2vh; font-weight:bold; padding:0.8vh; text-align:center; width:100%; transition:border-color 0.2s; }
+.adm-input:focus { border-color:#a37a00; outline:none; }
+.adm-save { width:100%; margin-top:2vh; padding:1.4vh 0; background:#a37a00; border:none; border-radius:12px; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:2.6vh; font-weight:bold; letter-spacing:0.15em; cursor:pointer; transition:opacity 0.2s; }
+.adm-save:hover { opacity:0.88; }
+.adm-save:disabled { opacity:0.4; }
+.adm-msg { text-align:center; font-size:1.4vh; margin-top:1vh; min-height:1.5vh; font-weight:bold; }
+.adm-msg.ok { color:#24b663; }
+.adm-msg.err { color:#b3261e; }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="pinOv">
+  <div class="pin-box">
+    <div class="pin-title">Acces Admin</div>
+    <div class="pin-sub">Introduceti codul de acces</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-keypad">
+      <div class="pin-key" onclick="pk('1')">1</div><div class="pin-key" onclick="pk('2')">2</div><div class="pin-key" onclick="pk('3')">3</div>
+      <div class="pin-key" onclick="pk('4')">4</div><div class="pin-key" onclick="pk('5')">5</div><div class="pin-key" onclick="pk('6')">6</div>
+      <div class="pin-key" onclick="pk('7')">7</div><div class="pin-key" onclick="pk('8')">8</div><div class="pin-key" onclick="pk('9')">9</div>
+      <div class="pin-key sm" onclick="pkDel()">Sterge</div>
+      <div class="pin-key" onclick="pk('0')">0</div>
+      <div class="pin-key sm" onclick="pinClose()">Iesi</div>
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+  </div>
+</div>
+
+<div class="admin-ov" id="adminOv">
+  <div class="admin-box">
+    <div class="adm-head">
+      <div class="adm-title">Editeaza Cursuri (Tic Tac)</div>
+      <button class="adm-close" onclick="adminClose()">X</button>
+    </div>
+    <div class="adm-cols">
+      <div>Valuta</div><div>Cumparam</div><div>Vindem</div><div>Card</div>
+    </div>
+    <div id="adminRows"></div>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:1vw; margin:1.5vh 0; padding-top:1.5vh; border-top:2px solid #eee;">
+      <span style="font-family:'Oswald',sans-serif; font-size:1.8vh; font-weight:700; color:#111;">Procent Card (peste curs Vindem, %)</span>
+      <input class="adm-input" type="number" step="0.01" id="admCardPct" style="width:16vw;" value="1.45" oninput="admUpdateAllCardPreviews()">
+    </div>
+    <button class="adm-save" id="admSaveBtn" onclick="adminSave()">Salveaza Cursurile</button>
+    <div class="adm-msg" id="admMsg"></div>
+  </div>
+</div>
+
+<div class="shell">
+  <header class="header">
+    <div class="brand">
+      <div class="brand-top"><span class="grn">SERMIRAV </span><span class="gold">EXCHANGE</span></div>
+      <div class="brand-top" style="font-size:4.2vh;letter-spacing:0.22em;color:#111;margin-top:-0.4vh">TIC TAC</div>
+    </div>
+    <div class="header-center">
+      <div class="weather-row">
+        <div id="wIcon" class="w-icon-container"></div>
+        <strong id="wTemp">--C</strong>
+      </div>
+    </div>
+    <div class="clock-wrap">
+      <div class="clock-time" onclick="clockTap()"><span id="cHM">--:--</span><span class="clock-s" id="cS">:00</span></div>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <div class="col-heads">
+      <div class="col-h">Valuta</div>
+      <div class="col-h buy">
+        <div class="hdr-cube-wrap">
+          <div class="hdr-cube-track">
+            <div class="hdr-cube-item">Cumparam</div>
+            <div class="hdr-cube-item">We Buy</div>
+            <div class="hdr-cube-item">Cumparam</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-h sell">
+        <div class="hdr-cube-wrap">
+          <div class="hdr-cube-track">
+            <div class="hdr-cube-item">Vindem</div>
+            <div class="hdr-cube-item">We Sell</div>
+            <div class="hdr-cube-item">Vindem</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-h card">
+        <div class="card-cube-wrap">
+          <div class="card-cube-track">
+            <div class="card-cube-item front">VANZARE CARD</div>
+            <div class="card-cube-item back">
+              <svg class="card-icon-svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              <span>POS</span>
+            </div>
+            <div class="card-cube-item front">VANZARE CARD</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="rates-body" id="ratesBody"></div>
+  </div>
+</div>
+
+<button class="admin-btn" onclick="pinOpen()">M</button>
+
+<script>
+var PIN = "1234";
+var FB_URL = "https://tictac-319f5-default-rtdb.europe-west1.firebasedatabase.app/tictac/rates";
+var CARD_MARKUP = 1.0145;
+
+function cardRate(sell) {
+  if(sell === null || sell === undefined || sell === "") return null;
+  return parseFloat(sell) * CARD_MARKUP;
+}
+
+var CURRENCIES = [
+  {code:"EUR", name:"EURO",              flag:"https://flagcdn.com/eu.svg"},
+  {code:"USD", name:"DOLAR<br>AMERICAN",   flag:"https://flagcdn.com/us.svg"},
+  {code:"GBP", name:"LIRA<br>STERLINA",    flag:"https://flagcdn.com/gb.svg"},
+  {code:"CHF", name:"FRANC<br>ELVETIAN",   flag:"https://flagcdn.com/ch.svg"},
+  {code:"CAD", name:"DOLAR<br>CANADIAN",   flag:"https://flagcdn.com/ca.svg"},
+  {code:"AUD", name:"DOLAR<br>AUSTRALIAN", flag:"https://flagcdn.com/au.svg"},
+  {code:"PLN", name:"ZLOT<br>POLONEZ",     flag:"https://flagcdn.com/pl.svg"},
+  {code:"TRY", name:"LIRA<br>TURCEASCA",   flag:"https://flagcdn.com/tr.svg"},
+  {code:"HUF", name:"FORINT<br>MAGHIAR",   flag:"https://flagcdn.com/hu.svg"},
+  {code:"AED", name:"DIRHAM<br>EMIRATE",   flag:"https://flagcdn.com/ae.svg"}
+];
+
+var DEF = {
+  EUR:{buy:4.97,sell:5.05}, USD:{buy:4.33,sell:4.45},
+  GBP:{buy:5.82,sell:6.03}, CHF:{buy:5.59,sell:5.71},
+  CAD:{buy:3.07,sell:3.30}, AUD:{buy:2.76,sell:3.10},
+  PLN:{buy:1.14,sell:1.22}, TRY:{buy:0.095,sell:0.119},
+  HUF:{buy:0.013,sell:0.0141}, AED:{buy:1.0020,sell:1.2500}
+};
+
+var rates = {};
+for(var k in DEF) rates[k] = DEF[k];
+
+function fmt(v) {
+  if(v === null || v === undefined || v === "") return "-";
+  return parseFloat(v).toFixed(4);
+}
+
+function buildRows() {
+  var body = document.getElementById("ratesBody");
+  body.innerHTML = "";
+  for(var i=0; i<CURRENCIES.length; i++) {
+    var cur = CURRENCIES[i];
+    var rv = rates[cur.code] || {};
+    var parity = (i % 2 === 0) ? "rr-odd" : "rr-even";
+    var borderCls = (i === CURRENCIES.length - 1) ? "" : " rr-border";
+    var cls = parity + borderCls;
+    var row = document.createElement("div");
+    row.className = "rate-row";
+    row.innerHTML =
+      '<div class="cur-cell ' + cls + '">' +
+        '<img src="' + cur.flag + '" class="flag-img" alt="' + cur.code + '">' +
+        '<div class="cur-name-full">' + cur.name + '</div>' +
+      '</div>' +
+      '<div class="rate-cell ' + cls + '"><div class="rate-box buy" id="b-' + cur.code + '">' + fmt(rv.buy) + '</div></div>' +
+      '<div class="rate-cell ' + cls + '"><div class="rate-box sell" id="s-' + cur.code + '">' + fmt(rv.sell) + '</div></div>' +
+      '<div class="rate-cell card-col ' + cls + '"><div class="rate-box card" id="c-' + cur.code + '">' + fmt(cardRate(rv.sell)) + '</div></div>';
+    body.appendChild(row);
+  }
+}
+
+function updateVals() {
+  for(var i=0; i<CURRENCIES.length; i++) {
+    var cur = CURRENCIES[i];
+    var rv = rates[cur.code] || {};
+    var b = document.getElementById("b-" + cur.code);
+    var s = document.getElementById("s-" + cur.code);
+    var c = document.getElementById("c-" + cur.code);
+    if(b) {
+      var newValB = fmt(rv.buy);
+      if(b.textContent !== newValB) {
+        b.textContent = newValB;
+        b.classList.add("updating");
+        setTimeout(function(){ b.classList.remove("updating"); }, 600);
+      }
+    }
+    if(s) {
+      var newValS = fmt(rv.sell);
+      if(s.textContent !== newValS) {
+        s.textContent = newValS;
+        s.classList.add("updating");
+        setTimeout(function(){ s.classList.remove("updating"); }, 600);
+      }
+    }
+    if(c) {
+      var newValC = fmt(cardRate(rv.sell));
+      if(c.textContent !== newValC) {
+        c.textContent = newValC;
+        c.classList.add("updating");
+        setTimeout(function(){ c.classList.remove("updating"); }, 600);
+      }
+    }
+  }
+}
+
+function fetchRates() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", FB_URL + ".json", true);
+  xhr.onreadystatechange = function() {
+    if(xhr.readyState === 4 && xhr.status === 200) {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        if(d) {
+          rates = d;
+          if(typeof d._cardPct === "number") CARD_MARKUP = 1 + (d._cardPct / 100);
+          updateVals();
+        }
+      } catch(e) {}
+    }
+  };
+  xhr.send();
+}
+
+function saveRates(nr, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("PUT", FB_URL + ".json", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.onreadystatechange = function() {
+    if(xhr.readyState === 4) {
+      if(xhr.status === 200) callback(null);
+      else callback("Eroare HTTP " + xhr.status);
+    }
+  };
+  xhr.send(JSON.stringify(nr));
+}
+
+fetchRates();
+setInterval(fetchRates, 30000);
+
+function tick() {
+  var now = new Date();
+  var roOpts = { timeZone: "Europe/Bucharest", hour12: false, year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" };
+  var roParts = new Intl.DateTimeFormat("en-US", roOpts).formatToParts(now);
+  var roObj = {};
+  for(var p of roParts) { if(p.type !== "literal") roObj[p.type] = p.value; }
+  
+  var h = String(roObj.hour).padStart(2,"0");
+  var m = String(roObj.minute).padStart(2,"0");
+  var s = String(roObj.second).padStart(2,"0");
+
+  document.getElementById("cHM").textContent = h + ":" + m;
+  document.getElementById("cS").textContent  = ":" + s;
+}
+tick(); setInterval(tick, 1000);
+
+var SVGS = {
+  sun:    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="#ffb300"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="#ffb300" stroke-width="2" stroke-linecap="round"/></svg>',
+  cloud:  '<svg viewBox="0 0 24 24"><path d="M6.5 18A3.5 3.5 0 0 1 10 14.5c.3 0 .58.04.85.11A4.5 4.5 0 0 1 19.5 13a4.5 4.5 0 0 1 .5 8.97V22H6.5a3.5 3.5 0 0 1 0-7z" fill="#b0bec5"/></svg>',
+  partly: '<svg viewBox="0 0 24 24"><circle cx="15.5" cy="8.5" r="3.5" fill="#ffb300"/><path d="M6.5 18A3.5 3.5 0 0 1 10 14.5c.3 0 .58.04.85.11A4.5 4.5 0 0 1 19.5 13a4.5 4.5 0 0 1 .5 8.97V22H6.5a3.5 3.5 0 0 1 0-7z" fill="#cfd8dc"/></svg>',
+  rain:   '<svg viewBox="0 0 24 24"><path d="M6.5 15A3.5 3.5 0 0 1 10 11.5c.3 0 .58.04.85.11A4.5 4.5 0 0 1 19.5 10a4.5 4.5 0 0 1 .5 8.97V19H6.5a3.5 3.5 0 0 1 0-7z" fill="#90a4ae"/><path d="M9 21v2M13 21v2M17 21v2" stroke="#29b6f6" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  snow:   '<svg viewBox="0 0 24 24"><path d="M6.5 15A3.5 3.5 0 0 1 10 11.5c.3 0 .58.04.85.11A4.5 4.5 0 0 1 19.5 10a4.5 4.5 0 0 1 .5 8.97V19H6.5a3.5 3.5 0 0 1 0-7z" fill="#90a4ae"/><circle cx="9" cy="22" r="1" fill="#e0e0e0"/><circle cx="13" cy="22" r="1" fill="#e0e0e0"/><circle cx="17" cy="22" r="1" fill="#e0e0e0"/></svg>',
+  storm:  '<svg viewBox="0 0 24 24"><path d="M6.5 15A3.5 3.5 0 0 1 10 11.5c.3 0 .58.04.85.11A4.5 4.5 0 0 1 19.5 10a4.5 4.5 0 0 1 .5 8.97V19H6.5a3.5 3.5 0 0 1 0-7z" fill="#78909c"/><path d="M13 18l-2 3h3l-1 3" stroke="#ffeb3b" stroke-width="1.5" fill="none"/></svg>'
+};
+var WC = {0:"sun",1:"partly",2:"partly",3:"cloud",45:"cloud",48:"cloud",51:"rain",53:"rain",55:"rain",61:"rain",63:"rain",65:"rain",71:"snow",73:"snow",75:"snow",80:"rain",81:"rain",82:"storm",95:"storm",96:"storm",99:"storm"};
+
+function fetchWeather() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "https://api.open-meteo.com/v1/forecast?latitude=45.0997&longitude=24.3693&current=temperature_2m,weathercode&timezone=auto", true);
+  xhr.onreadystatechange = function() {
+    if(xhr.readyState === 4 && xhr.status === 200) {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        var temp = Math.round(d.current.temperature_2m);
+        var code = d.current.weathercode;
+        var icon = WC[code] || "partly";
+        document.getElementById("wIcon").innerHTML = SVGS[icon];
+        document.getElementById("wTemp").textContent = temp + "C";
+      } catch(e) {}
+    }
+  };
+  xhr.send();
+}
+fetchWeather(); setInterval(fetchWeather, 600000);
+
+var buf = "";
+window.pk = function(d) {
+  if(buf.length >= 4) return;
+  buf += d;
+  for(var i=0; i<4; i++) document.getElementById("pd"+i).classList.toggle("on", i < buf.length);
+  if(buf.length === 4) {
+    setTimeout(function() {
+      if(buf === PIN) { pinClose(); adminOpen(); }
+      else {
+        document.getElementById("pinErr").textContent = "Cod incorect.";
+        setTimeout(function() {
+          buf = "";
+          for(var i=0; i<4; i++) document.getElementById("pd"+i).classList.remove("on");
+          document.getElementById("pinErr").textContent = "";
+        }, 900);
+      }
+      buf = "";
+    }, 150);
+  }
+};
+window.pkDel = function() {
+  buf = buf.slice(0,-1);
+  for(var i=0; i<4; i++) document.getElementById("pd"+i).classList.toggle("on", i < buf.length);
+};
+window.pinClose = function() {
+  document.getElementById("pinOv").classList.remove("show");
+  buf = "";
+  for(var i=0; i<4; i++) document.getElementById("pd"+i).classList.remove("on");
+  document.getElementById("pinErr").textContent = "";
+};
+window.pinOpen = function() { document.getElementById("pinOv").classList.add("show"); };
+
+var tc=0, tt=null;
+window.clockTap = function() {
+  tc++; clearTimeout(tt);
+  tt = setTimeout(function(){ tc=0; }, 1400);
+  if(tc >= 3) { tc=0; adminOpen(); }
+};
+
+var kbuf = "", ktimer = null;
+document.addEventListener("keydown", function(e) {
+  if(e.key === "Escape") { pinClose(); adminClose(); return; }
+  if(e.key >= "0" && e.key <= "9") {
+    kbuf += e.key;
+    clearTimeout(ktimer);
+    ktimer = setTimeout(function(){ kbuf = ""; }, 4000);
+    if(kbuf.slice(-4) === PIN) {
+      kbuf = "";
+      pinClose();
+      adminOpen();
+    }
+  }
+});
+
+function adminOpen() {
+  var rows = document.getElementById("adminRows");
+  rows.innerHTML = "";
+  for(var i=0; i<CURRENCIES.length; i++) {
+    var cur = CURRENCIES[i];
+    var rv = rates[cur.code] || {};
+    var cleanName = cur.name.replace(/<br>/g, " ");
+    var row = document.createElement("div");
+    row.className = "adm-row";
+    row.innerHTML =
+      '<div class="adm-cur"><img src="' + cur.flag + '" style="width:4vh;height:2.5vh;object-fit:cover;border-radius:3px;"> ' + cur.code + ' - ' + cleanName + '</div>' +
+      '<input class="adm-input" type="number" step="0.0001" id="ab-' + cur.code + '" value="' + (rv.buy||"") + '">' +
+      '<input class="adm-input" type="number" step="0.0001" id="as-' + cur.code + '" oninput="admUpdateCardPreview(\'' + cur.code + '\')" value="' + (rv.sell||"") + '">' +
+      '<div class="adm-card-preview" id="ac-' + cur.code + '">' + fmt(cardRate(rv.sell)) + '</div>';
+    rows.appendChild(row);
+  }
+  var pctInput = document.getElementById("admCardPct");
+  if(pctInput) pctInput.value = ((CARD_MARKUP - 1) * 100).toFixed(2);
+  document.getElementById("adminOv").classList.add("show");
+};
+window.admUpdateCardPreview = function(code) {
+  var sellInput = document.getElementById("as-" + code);
+  var preview = document.getElementById("ac-" + code);
+  if(sellInput && preview) {
+    var pctInput = document.getElementById("admCardPct");
+    var pct = pctInput ? parseFloat(pctInput.value) : ((CARD_MARKUP - 1) * 100);
+    if(isNaN(pct)) pct = (CARD_MARKUP - 1) * 100;
+    var sellVal = parseFloat(sellInput.value);
+    preview.textContent = isNaN(sellVal) ? "-" : (sellVal * (1 + pct / 100)).toFixed(4);
+  }
+};
+window.admUpdateAllCardPreviews = function() {
+  for(var i = 0; i < CURRENCIES.length; i++) {
+    window.admUpdateCardPreview(CURRENCIES[i].code);
+  }
+};
+window.adminClose = function() { document.getElementById("adminOv").classList.remove("show"); };
+window.adminSave = function() {
+  var btn = document.getElementById("admSaveBtn");
+  var msg = document.getElementById("admMsg");
+  btn.disabled = true; btn.textContent = "Se salveaza...";
+  var nr = {};
+  for(var i=0; i<CURRENCIES.length; i++) {
+    var cur = CURRENCIES[i];
+    nr[cur.code] = {
+      buy:  parseFloat(document.getElementById("ab-"+cur.code).value) || null,
+      sell: parseFloat(document.getElementById("as-"+cur.code).value) || null
+    };
+  }
+  var pctVal = parseFloat(document.getElementById("admCardPct").value);
+  if(isNaN(pctVal)) pctVal = (CARD_MARKUP - 1) * 100;
+  nr._cardPct = pctVal;
+  saveRates(nr, function(err) {
+    if(!err) {
+      rates = nr;
+      CARD_MARKUP = 1 + (pctVal / 100);
+      updateVals();
+      msg.textContent = "Salvat cu succes!"; msg.className = "adm-msg ok";
+    } else {
+      msg.textContent = "Eroare: " + err; msg.className = "adm-msg err";
+    }
+    btn.disabled = false; btn.textContent = "Salveaza Cursurile";
+    setTimeout(function(){ msg.textContent=""; msg.className="adm-msg"; }, 4000);
+  });
+};
+
+buildRows();
+</script>
+</body>
+</html>
